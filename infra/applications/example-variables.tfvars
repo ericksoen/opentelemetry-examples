@@ -1,0 +1,5 @@
+image_repository = ""
+gateway_bearer_token = ""
+otlp_authorized_hostname = ""
+otlp_insecure_hostname = ""
+jaeger_ui_hostname = ""

@@ -1,0 +1,27 @@
+extensions:
+  health_check:
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+processors:
+  attributes:
+    actions:
+      - key: environment
+        value: dev
+        action: insert
+exporters:
+  otlp:
+    endpoint: gateway:4320
+    insecure: true
+  logging:
+    logLevel: debug
+
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [attributes]
+      exporters: [otlp, logging]

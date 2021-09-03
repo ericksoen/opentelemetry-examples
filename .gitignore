@@ -1,0 +1,15 @@
+.venv
+.env
+dist
+__pycache__
+
+# Ignore Terraform build artifacts including state
+*.tfvars
+!*example-variables.tfvars
+.terraform
+terraform.tfstate*
+.terraform.lock.hcl
+
+# Auto-generated bootstrap script
+template.sh
+

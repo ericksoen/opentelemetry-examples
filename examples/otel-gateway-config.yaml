@@ -1,0 +1,29 @@
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13134
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4320
+      http:
+processors:
+  attributes:
+    actions:
+      - key: tenant
+        value: gateway
+        action: insert
+exporters:
+  jaeger:
+    endpoint: jaeger:14250
+    insecure: true
+  logging:
+    logLevel: debug
+
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [attributes]
+      exporters: [logging, jaeger]

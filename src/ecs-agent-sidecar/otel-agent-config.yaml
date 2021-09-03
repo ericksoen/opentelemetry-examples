@@ -1,0 +1,34 @@
+extensions:
+  bearertokenauth:
+    token: ${GATEWAY_BEARER_TOKEN}
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+exporters:
+  logging:
+    loglevel: debug
+  otlp:
+    endpoint: ${OTLP_GATEWAY_HOST_INSECURE}:8443
+  otlp/auth:
+    endpoint: ${OTLP_GATEWAY_HOST_AUTH}:443
+    auth:
+      authenticator: bearertokenauth
+processors:
+  attributes/insert:
+    actions:
+      - key: 'lifecycle'
+        value: 'dev'
+        action: insert
+      - key: 'host-pattern'
+        value: 'ecs'
+        action: insert
+  batch:
+service:
+  extensions: [bearertokenauth]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch, attributes/insert]
+      exporters: [logging, otlp/auth, otlp]

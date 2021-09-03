@@ -1,0 +1,37 @@
+version: "2"
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - agent
+    environment:
+      - OTLP_TARGET=http://agent:4317
+  gateway:
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/otel-config.yaml", "--log-level=ERROR"]
+    ports:
+      - "13134:13134"
+      - "4320:4320"
+    volumes:
+      - ./otel-gateway-config.yaml:/etc/otel-config.yaml
+    depends_on:
+      - jaeger
+  agent:
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/otel-config.yaml", "--log-level=ERROR"]
+    ports:
+      - "13133:13133"
+      - "4317:4317"
+    volumes:
+      - ./otel-agent-config.yaml:/etc/otel-config.yaml
+    depends_on: 
+      - gateway
+  jaeger:
+    image: jaegertracing/all-in-one
+    command: ["--log-level=ERROR"]
+    ports:
+      - "14250:14250"
+      - "16686:16686"

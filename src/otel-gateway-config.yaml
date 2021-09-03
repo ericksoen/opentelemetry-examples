@@ -1,0 +1,40 @@
+extensions:
+  oidc:
+    issuer_url: ${BEARER_TOKEN_ISSUER_URL}
+    audience: account
+  health_check:
+receivers:
+  otlp:
+    protocols:
+      grpc:
+  otlp/auth:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4318
+        auth:
+          authenticator: oidc
+exporters:
+  jaeger:
+    endpoint: 0.0.0.0:14250
+    insecure: true
+  logging:
+    logLevel: debug
+  otlp:
+    endpoint: 'api.honeycomb.io:443'
+    headers:
+      'x-honeycomb-team': '${HONEYCOMB_WRITE_KEY}'
+      'x-honeycomb-dataset': '${HONEYCOMB_DATASET}'
+processors:
+  attributes/insert:
+    actions:
+      - key: 'lifecycle'
+        value: 'dev'
+        action: upsert
+  batch:
+service:
+  extensions: [oidc, health_check]
+  pipelines:
+    traces:
+      receivers: [otlp, otlp/auth]
+      processors: [batch, attributes/insert]
+      exporters: [logging, otlp, jaeger]

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+sudo yum install amazon-cloudwatch-agent -y
+sudo /usr/bin/amazon-cloudwatch-agent-ctl -a fetch-config -o ssm:${otel_config_path} -s
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:${cw_config_path}
+
+mkdir -p temp
+aws s3 cp s3://${s3_bucket_name}/scripts ./temp --recursive
+
+pushd temp
+
+sudo python3 -m venv .venv
+
+source .venv/bin/activate
+
+sudo python3 -m pip install -r requirements.txt
+
+sudo python3 -m flask run --host=0.0.0.0 --port=5001
+
+sudo deactivate
+popd

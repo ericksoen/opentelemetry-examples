@@ -1,0 +1,27 @@
+receivers:
+    otlp:
+        protocols:
+            grpc:
+            http:
+exporters:
+    logging:
+        loglevel: debug
+    otlp:
+      endpoint: ${OTLP_GATEWAY_HOST_INSECURE}:8443
+processors:
+  attributes/insert:
+    actions:
+      - key: "lifecycle"
+        value: "dev"
+        action: insert
+      - key: "host-pattern"
+        value: "ec2"
+        action: insert
+  batch:
+service:
+  extensions: []
+  pipelines:
+      traces:
+          receivers: [otlp]
+          processors: [batch, attributes/insert]
+          exporters: [logging, otlp]
