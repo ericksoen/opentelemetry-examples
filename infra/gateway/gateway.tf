@@ -16,9 +16,6 @@ resource "aws_ecs_service" "gateway" {
   task_definition = aws_ecs_task_definition.gateway.arn
   desired_count   = 1
   launch_type     = "FARGATE"
-  depends_on = [
-    aws_iam_role.task
-  ]
 
   network_configuration {
     subnets          = data.aws_subnet_ids.private.ids
@@ -47,6 +44,12 @@ resource "aws_ecs_service" "gateway" {
     container_port = 16686
   }
 
+  depends_on = [
+    aws_iam_role.task,
+    aws_lb_target_group.otlp_auth,
+    aws_lb_target_group.otlp_insecure,
+    aws_lb_target_group.jaeger_ui
+  ]
 }
 
 resource "aws_ecs_task_definition" "gateway" {

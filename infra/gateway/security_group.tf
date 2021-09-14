@@ -1,5 +1,5 @@
 resource "aws_security_group" "allow_otlp" {
-  name        = "allow_otlp"
+  name        = "${var.resource_prefix}-allow-otlp"
   description = "Allow inbound traffic to OTLP port"
 
   vpc_id = data.aws_vpc.vpc.id
