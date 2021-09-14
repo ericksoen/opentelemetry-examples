@@ -32,3 +32,8 @@ resource "aws_iam_role_policy_attachment" "xray" {
   role       = aws_iam_role.iam_for_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
 }
+
+resource "aws_iam_role_policy_attachment" "vpc" {
+  role = aws_iam_role.iam_for_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}

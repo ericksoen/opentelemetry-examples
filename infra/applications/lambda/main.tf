@@ -1,10 +1,10 @@
 resource "aws_lambda_function" "lambda" {
-  filename      = "../../dist/otlp_lambda.zip"
+  filename      = "${path.module}/../../../src/dist/otlp_lambda.zip"
   function_name = "${var.resource_prefix}-lambda"
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "main.handler"
 
-  source_code_hash = filebase64sha256("../../dist/otlp_lambda.zip")
+  source_code_hash = filebase64sha256("${path.module}/../../../src/dist/otlp_lambda.zip")
 
   runtime     = "python3.8"
   memory_size = 512
@@ -19,6 +19,10 @@ resource "aws_lambda_function" "lambda" {
     }
   }
 
+  vpc_config {
+    subnet_ids = var.subnet_ids
+    security_group_ids = [aws_security_group.lambda.id]
+  }
   tracing_config {
     mode = "Active"
   }
