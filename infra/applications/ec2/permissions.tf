@@ -28,9 +28,10 @@ data "aws_iam_policy_document" "permission" {
   statement {
     effect    = "Allow"
     actions   = ["ssm:*"]
-    resources = [aws_ssm_parameter.config.arn]
+    resources = [aws_ssm_parameter.config.arn, aws_ssm_parameter.lambda.arn]
   }
 }
+
 
 resource "aws_iam_role_policy" "permission" {
   role   = aws_iam_role.ec2_role.id

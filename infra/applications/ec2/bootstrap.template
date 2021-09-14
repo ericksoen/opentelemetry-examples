@@ -7,15 +7,32 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-c
 mkdir -p temp
 aws s3 cp s3://${s3_bucket_name}/scripts ./temp --recursive
 
+if [ $? -ne 0 ]; 
+then
+    echo "[ERROR] Could not copy bootstrap scripts to instance"
+    exit 1
+fi
+
 pushd temp
 
 sudo python3 -m venv .venv
+
+if [ $? -ne 0 ]; 
+then
+    echo "[ERROR] Could not create Python virtual environment"
+    exit 1
+fi
 
 source .venv/bin/activate
 
 sudo python3 -m pip install -r requirements.txt
 
+if [ $? -ne 0 ]; 
+then
+    echo "[ERROR] Could not install Python requirements"
+    exit 1
+fi
+
 sudo python3 -m flask run --host=0.0.0.0 --port=5001
 
-sudo deactivate
 popd
