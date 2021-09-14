@@ -12,8 +12,8 @@ module "ecs" {
     source_security_group_id = aws_security_group.alb_sg.id
     
     server_hostname = module.app.record_name
-    server_request_resource = "/${local.secondary_rest_resource}"
-    health_check_path = "/${local.primary_rest_resource}"
+    server_request_resource = "${local.secondary_rest_resource}"
+    health_check_path = "${local.primary_rest_resource}"
 
     subnet_ids = data.aws_subnet_ids.private.ids
     vpc_id = data.aws_vpc.vpc.id
