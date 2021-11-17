@@ -13,7 +13,7 @@ module "ecs" {
     
     server_hostname = module.app.record_name
     server_request_resource = "${local.secondary_rest_resource}"
-    health_check_path = "${local.primary_rest_resource}"
+    health_check_path = "/status"
 
     subnet_ids = data.aws_subnet_ids.private.ids
     vpc_id = data.aws_vpc.vpc.id
@@ -32,7 +32,7 @@ module "ec2" {
 
     server_hostname = module.app.record_name
     server_request_resource = "/${local.tertiary_rest_resource}"
-    health_check_path = "/${local.secondary_rest_resource}"
+    health_check_path = "/status"
 
     subnet_ids = data.aws_subnet_ids.private.ids
     vpc_id = data.aws_vpc.vpc.id

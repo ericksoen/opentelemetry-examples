@@ -47,6 +47,10 @@ app = flask.Flask(__name__)
 FlaskInstrumentor().instrument_app(app)
 RequestsInstrumentor().instrument()
 
+@app.route('/status')
+def status():
+    return {"Success": True}
+    
 @app.route("/ec2")
 def hello():
     tracer = trace.get_tracer(__name__)
