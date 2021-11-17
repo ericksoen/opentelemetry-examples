@@ -32,9 +32,9 @@ processors:
         action: upsert
   batch:
 service:
-  extensions: [oidc, health_check]
+  extensions: [health_check]
   pipelines:
     traces:
-      receivers: [otlp, otlp/auth]
+      receivers: [otlp]
       processors: [batch, attributes/insert]
       exporters: [logging, otlp, jaeger]

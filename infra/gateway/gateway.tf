@@ -24,13 +24,6 @@ resource "aws_ecs_service" "gateway" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.otlp_auth.arn
-    container_name   = "${var.resource_prefix}"
-
-    container_port = 4318
-  }
-
-  load_balancer {
     target_group_arn = aws_lb_target_group.otlp_insecure.arn
     container_name   = "${var.resource_prefix}"
 
@@ -46,7 +39,6 @@ resource "aws_ecs_service" "gateway" {
 
   depends_on = [
     aws_iam_role.task,
-    aws_lb_target_group.otlp_auth,
     aws_lb_target_group.otlp_insecure,
     aws_lb_target_group.jaeger_ui
   ]
@@ -75,12 +67,6 @@ resource "aws_ecs_task_definition" "gateway" {
           awslogs-stream-prefix = "collector"
         }
       },
-      environment = [
-        {
-          "name" : "BEARER_TOKEN_ISSUER_URL",
-          "value" : var.bearer_token_issuer_url
-        }        
-      ]
       secrets = [
         {
           "name" : "HONEYCOMB_WRITE_KEY",
@@ -96,11 +82,6 @@ resource "aws_ecs_task_definition" "gateway" {
           protocol      = "tcp"
           containerPort = 4317
           hostPort      = 4317
-        },
-        {
-          protocol      = "tcp"
-          containerPort = 4318
-          hostPort      = 4318
         },
         {
           protocol      = "tcp"

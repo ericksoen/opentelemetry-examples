@@ -16,14 +16,12 @@ This client application includes a load balancer that distributes traffic to API
 |image_repository||
 |default_tags||
 |domain||
-|gateway_bearer_token||
-|otlp_authorized_hostname||
 |otlp_insecure_hostname||
 |jaeger_ui_hostname||
 
 ## Deployment
 
-Update the [example-variables.tfvars](./example-variables.tfvars) with the required values. Many of the values from previous steps (either as Terraform output values _or_ from the small shell script executed after creating the authentication service).
+Update the [example-variables.tfvars](./example-variables.tfvars) with the required values. Many of the values from previous steps, e.g., as Terraform output values.
 
 ```bash
 pushd infra/applications

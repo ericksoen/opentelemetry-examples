@@ -22,9 +22,7 @@ module "ecs" {
     region_name = local.region_name
     image_repository_name = var.image_repository
 
-    otlp_authorized_hostname = var.otlp_authorized_hostname
     otlp_insecure_hostname = var.otlp_insecure_hostname
-    gateway_bearer_token = var.gateway_bearer_token
 }
 
 module "ec2" {

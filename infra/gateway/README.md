@@ -15,8 +15,6 @@ This infrastructure creates the OpenTelemetry Gateway collector as an ECS task r
 |honeycomb_write_key||
 |honeycomb_dataset||
 
-Update `example-variables.tfvars` with the required values (using the `bearer_token_issuer_url` from the previous `auth` service infrastructure deployment).
-
 ```bash
 pushd infra/gateway
 $ terraform apply -var-file="example-variables.tfvars" -var-file="../shared-example-variables.tfvars"
@@ -24,6 +22,5 @@ $ terraform apply -var-file="example-variables.tfvars" -var-file="../shared-exam
 Outputs:
 
 jaeger_hostname = "jaeger.domain.com"
-otlp_authorized_hostname = "otlp.domain.com"
 otlp_insecure_hostname = "otlp-insecure.domain.com"
 ```
