@@ -1,4 +1,4 @@
-import flask
+from flask import Flask, send_from_directory
 import requests
 import os
 
@@ -29,11 +29,19 @@ trace.get_tracer_provider().add_span_processor(span_processor)
 
 tracer = trace.get_tracer(__name__)
 
-app = flask.Flask(__name__)
+app = Flask(__name__)
 FlaskInstrumentor().instrument_app(app)
 RequestsInstrumentor().instrument()
 
-@app.route("/")
+@app.route('/')
+def home():
+    return send_from_directory('', 'home.html')
+    
+@app.route('/status')
+def ping():
+    return {"Success": True}
+
+@app.route("/sample")
 def hello():
     tracer = trace.get_tracer(__name__)
     with tracer.start_as_current_span("example-request"):
