@@ -7,8 +7,8 @@ resource "aws_lb_target_group" "tg" {
 
   health_check {
     enabled  = true
-    path     = "/${var.health_check_path}"
-    interval = 300
+    path     = "${var.health_check_path}"
+    interval = 30
   }
 }
 
