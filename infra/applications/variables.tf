@@ -35,15 +35,7 @@ variable "app_subdomain" {
   default     = "demo"
 }
 
-variable "gateway_bearer_token" {
-  description = "The bearer token to use to authenticate RPC requests to the gateway collector"
-}
-
-variable "otlp_authorized_hostname" {
-  description = "The URL to send OTLP traffic containing an auth token"
-}
-
-variable "otlp_insecure_hostname" {
+variable "otlp_hostname" {
   description = "The URL to send OTLP traffic without an auth token"
 }
 

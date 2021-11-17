@@ -6,7 +6,7 @@ variable "region_name" {
     
 }
 
-variable "otlp_insecure_hostname" {
+variable "otlp_hostname" {
 
 }
 

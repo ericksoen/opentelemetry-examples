@@ -38,14 +38,5 @@ variable "region_name" {
 }
 
 variable "image_repository_name" { }
-variable "otlp_authorized_hostname" {
 
-}
-
-variable "otlp_insecure_hostname" {
-
-}
-
-variable "gateway_bearer_token" {
-
-}
+variable "otlp_hostname" { }

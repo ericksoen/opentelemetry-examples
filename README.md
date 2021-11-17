@@ -37,23 +37,13 @@ The architecture diagram below shows the hosting pattern for [OpenTelemetry coll
 
 ![Open Telemetry Hosting Architecture](./images/OpenTelemetryArchitecture.png)
 
-This architecture diagram _excludes_ two important details. First, there is a separate cluster that runs an authentication service (available at `auth.domain.com` by default). The OpenTelemetry Agent collector running alongside the `ecs` service includes a bearer token on outgoing requests to the OpenTelemetry Gateway. This latter service authenticates token validate against an authentication service endpoint.
-
 Second, the OpenTelemetry configuration for the Gateway service transmits data to [HoneyComb](https://www.honeycomb.io/blog/all-in-on-opentelemetry/). If you're not interested in transmitting telemetry to HoneyComb, remove these configuration lines. Alternatively, HoneyComb has an accessible and easy to use [free tier](https://www.honeycomb.io/pricing/) that you may want to consider.
 
-## Authentication
+## Security
 
-This sample hosting implementation provides both secure (via bearer token validation) and insecure gateway endpoints (VPC security only) for OTLP data.
+An initial version of this example repo included a self-hosted authentication server to be used in conjunction with the `bearertokenauth`. However, support for this extension was _not_ available in the AWS Distro for OpenTelemetry [ADOT] across all the referenced services (ECS, EC2 and Lambda).
 
-As noted in the **Caveats** section below, the AWS OpenTelemetry distro does not currently support extensions such as `bearertokenauth` and `oidc` so the _secure_ option is not available for AWS services that use their distribution, e.g., the Lambda layer for serverless and the Otel CloudWatch agent for EC2 instances.
-
-|Service|Secure|Insecure|
-|-|-|-|
-|ECS|Yes|Yes|
-|EC2|-|Yes|
-|Lambda|-|Yes|
-
-Requests made to the root ECS service will transmit telemetry data via both the _secure_ and _insecure_ endpoints. This means that some trace data will be duplicated in your backend store. Since this is a trial implementation only and not production quality infrastructure, this is an acceptable oddity.
+The example authentication flow is now included in a separate, [public repository](https://github.com/ericksoen/opentelemetry-examples-auth). Alternatively, you can reference the [auth](https://github.com/ericksoen/opentelemetry-examples/tree/auth) tag for this repository instead.
 
 ## Deployment
 
@@ -71,7 +61,6 @@ Once you have created the necessary images and packages, deploy the infrastructu
 ### Generating trace data
 
 After packaging and deploying your applications, you can start to generate trace data and visualize it via one or more of the configured backends (Jaeger, HoneyComb, etc.).
-
 
 To generate trace data, navigate to the demo site landing page (a Terraform output value from the application infrastructure deployment).
 
@@ -95,21 +84,15 @@ Please note that your experience deploying this infrastructure may differ if som
 1. A single VPC can be identified using one or more of the provided [VPC filter criteria](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVpcs.html) 
 1. Public and private subnets that belong to the VPC above can be identified using one or more provided [subnet filter criteria](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSubnets.html)
 1. An Elastic Container Repository (ECR) already exists for your images
-1. A domain and Route53 hosted zone exist that will serve as the _main_
-domain for the subdomains created by this project
+1. A domain and Route53 hosted zone exist that will serve as the _main_ domain for the subdomains created by this project
 
 ### Caveats
 
 The caveats noted below attempt to describe some of the technical issues that limit running this service as a production-quality implementation.
 
-1. Bearer token authentication is unevenly implemented across the three application components (an ECS task, EC2 instance, and Lambda function all&mdash;all running behind a load balancer)
-   +  The EC2 instance and Lambda function both use the [AWS OpenTelemetry Distro](https://github.com/aws-observability/aws-otel-collector#aws-otel-collector-built-in-components), which does not currently support the `bearertokenauth` extension
-   +  The ECS task definition references the `otel/opentelemetry-collector` base image, which provides wider support for extensions
-1. Bearer tokens in this implementation are a static value that are not automatically refreshed and _may_ expire at some point depending on your authentication provider
 1. Some secrets such as the HoneyComb write key appear in plain-text in both the AWS SSM Parameter Store and the Terraform state file
-1. The Authentication provider, via [Keycloak](https://www.keycloak.org/), uses Spot instances for the ECS tasks as well as local storage
-   +  If your Spot Fargate task is terminated, you may need to reconfigure the various clients used in the authentication flow before you can transmit telemetry via the secure OTLP endpoint
 1. ECR images are pushed to a single repository and differentiated by the image tag
+1. Other than secure communication offer HTTPS, this example implementation provides minimal direction on securing your OpenTelemetry collector (see [Security](#Security))
 
 ## Open Issues
 

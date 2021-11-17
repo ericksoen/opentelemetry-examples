@@ -2,18 +2,7 @@ module "otlp" {
   source = "../modules/route53"
 
   domain = var.domain
-  subdomain = var.otlp_subdomain
-
-  route53_zone_id = data.aws_route53_zone.zone.id
-
-  records = [aws_lb.nlb.dns_name]
-}
-
-module "otlp_insecure" {
-  source = "../modules/route53"
-
-  domain = var.domain
-  subdomain = "${var.otlp_subdomain}-insecure"
+  subdomain = "${var.otlp_subdomain}"
 
   route53_zone_id = data.aws_route53_zone.zone.id
 
