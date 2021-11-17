@@ -1,5 +1,5 @@
-output "otlp_insecure_hostname" {
-    value = module.otlp_insecure.record_name
+output "otlp_hostname" {
+    value = module.otlp.record_name
 }
 
 output "jaeger_hostname" {

@@ -5,18 +5,18 @@ resource "aws_lb" "nlb" {
   subnets            = data.aws_subnet_ids.subnets.ids
 }
 
-resource "aws_lb_listener" "otlp_insecure" {
+resource "aws_lb_listener" "otlp" {
   load_balancer_arn = aws_lb.nlb.id
-  port              = "8443"
+  port              = "443"
   protocol          = "TLS"
-  certificate_arn   = module.otlp_insecure.certificate_arn
+  certificate_arn   = module.otlp.certificate_arn
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.otlp_insecure.arn
+    target_group_arn = aws_lb_target_group.otlp.arn
   }
 }
 
-resource "aws_lb_target_group" "otlp_insecure" {
+resource "aws_lb_target_group" "otlp" {
   name     = "${var.resource_prefix}-insecure-tg"
   port     = 4317
   protocol = "TCP"

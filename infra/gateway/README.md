@@ -22,5 +22,5 @@ $ terraform apply -var-file="example-variables.tfvars" -var-file="../shared-exam
 Outputs:
 
 jaeger_hostname = "jaeger.domain.com"
-otlp_insecure_hostname = "otlp-insecure.domain.com"
+otlp_hostname = "otlp.domain.com"
 ```

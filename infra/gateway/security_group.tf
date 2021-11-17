@@ -15,7 +15,7 @@ resource "aws_security_group_rule" "health_check" {
   security_group_id = aws_security_group.allow_otlp.id
 }
 
-resource "aws_security_group_rule" "otlp_insecure" {
+resource "aws_security_group_rule" "otlp" {
   type      = "ingress"
   protocol  = "tcp"
   from_port = 4317

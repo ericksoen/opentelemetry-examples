@@ -1,3 +1,3 @@
 image_repository = ""
-otlp_insecure_hostname = ""
+otlp_hostname = ""
 jaeger_ui_hostname = ""

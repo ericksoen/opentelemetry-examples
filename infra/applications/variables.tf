@@ -35,7 +35,7 @@ variable "app_subdomain" {
   default     = "demo"
 }
 
-variable "otlp_insecure_hostname" {
+variable "otlp_hostname" {
   description = "The URL to send OTLP traffic without an auth token"
 }
 

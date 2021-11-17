@@ -52,6 +52,6 @@ data "template_file" "config" {
   template = file("../../src/ec2/otel-agent-config.template")
 
   vars = {
-    OTLP_GATEWAY_HOST_INSECURE = var.otlp_insecure_hostname
+    OTLP_GATEWAY_HOST = var.otlp_hostname
   }
 }

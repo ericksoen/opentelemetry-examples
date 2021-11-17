@@ -39,4 +39,4 @@ variable "region_name" {
 
 variable "image_repository_name" { }
 
-variable "otlp_insecure_hostname" { }
+variable "otlp_hostname" { }

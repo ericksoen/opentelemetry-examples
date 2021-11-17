@@ -15,7 +15,7 @@ resource "aws_lambda_function" "lambda" {
     variables = {
       OPENTELEMETRY_COLLECTOR_CONFIG_FILE = "/var/task/config.yaml"
       AWS_LAMBDA_EXEC_WRAPPER             = "/opt/otel-instrument"
-      OTLP_GATEWAY_HOST_INSECURE                   = var.otlp_insecure_hostname
+      OTLP_GATEWAY_HOST                   = var.otlp_hostname
     }
   }
 

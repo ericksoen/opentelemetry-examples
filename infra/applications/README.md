@@ -16,7 +16,7 @@ This client application includes a load balancer that distributes traffic to API
 |image_repository||
 |default_tags||
 |domain||
-|otlp_insecure_hostname||
+|otlp_hostname||
 |jaeger_ui_hostname||
 
 ## Deployment

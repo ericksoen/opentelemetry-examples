@@ -8,7 +8,7 @@ exporters:
   logging:
     loglevel: debug
   otlp:
-    endpoint: ${OTLP_GATEWAY_HOST_INSECURE}:8443
+    endpoint: ${OTLP_GATEWAY_HOST}:443
 processors:
   attributes/insert:
     actions:

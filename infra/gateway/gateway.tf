@@ -24,7 +24,7 @@ resource "aws_ecs_service" "gateway" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.otlp_insecure.arn
+    target_group_arn = aws_lb_target_group.otlp.arn
     container_name   = "${var.resource_prefix}"
 
     container_port = 4317
@@ -37,9 +37,10 @@ resource "aws_ecs_service" "gateway" {
     container_port = 16686
   }
 
+  # TODO: Fix depends on
   depends_on = [
     aws_iam_role.task,
-    aws_lb_target_group.otlp_insecure,
+    aws_lb_target_group.otlp,
     aws_lb_target_group.jaeger_ui
   ]
 }

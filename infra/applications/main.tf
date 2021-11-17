@@ -22,7 +22,7 @@ module "ecs" {
     region_name = local.region_name
     image_repository_name = var.image_repository
 
-    otlp_insecure_hostname = var.otlp_insecure_hostname
+    otlp_hostname = var.otlp_hostname
 }
 
 module "ec2" {
@@ -38,7 +38,7 @@ module "ec2" {
     vpc_id = data.aws_vpc.vpc.id
     resource_prefix = var.resource_prefix
 
-    otlp_insecure_hostname = var.otlp_insecure_hostname
+    otlp_hostname = var.otlp_hostname
 }
 
 module "lambda" {
@@ -47,7 +47,7 @@ module "lambda" {
     resource_prefix = var.resource_prefix
     region_name = local.region_name
 
-    otlp_insecure_hostname = var.otlp_insecure_hostname
+    otlp_hostname = var.otlp_hostname
     subnet_ids = data.aws_subnet_ids.private.ids
     source_security_group_id = aws_security_group.alb_sg.id
 

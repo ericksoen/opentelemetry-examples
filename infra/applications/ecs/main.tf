@@ -109,8 +109,8 @@ resource "aws_ecs_task_definition" "app" {
       },
       environment = [
         {
-          "name" : "OTLP_GATEWAY_HOST_INSECURE",
-          "value" : "${var.otlp_insecure_hostname}"
+          "name" : "OTLP_GATEWAY_HOST",
+          "value" : "${var.otlp_hostname}"
         }
       ]
       portMappings = [
