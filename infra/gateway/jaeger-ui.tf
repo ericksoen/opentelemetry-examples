@@ -31,6 +31,21 @@ resource "aws_lb_listener_rule" "debug" {
     }
   }
 }
+
+resource "aws_lb_listener_rule" "metrics" {
+  listener_arn = aws_lb_listener.jaeger.arn
+  priority = 2
+  action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.metrics.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/metrics"]
+    }
+  }
+}
 resource "aws_lb_listener_certificate" "telemetry" {
   listener_arn = aws_lb_listener.jaeger.arn
   certificate_arn = module.telemetry.certificate_arn
@@ -39,6 +54,23 @@ resource "aws_lb_listener_certificate" "telemetry" {
 resource "aws_lb_target_group" "telemetry" {
   name        = "${var.resource_prefix}-telemetry-tg"
   port        = 55679
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = data.aws_vpc.vpc.id
+
+  health_check {
+    enabled = true
+    port = 13133
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    interval = 10
+    
+  }
+}
+
+resource "aws_lb_target_group" "metrics" {
+  name        = "${var.resource_prefix}-metrics-tg"
+  port        = 8888
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = data.aws_vpc.vpc.id

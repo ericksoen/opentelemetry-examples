@@ -44,11 +44,19 @@ resource "aws_ecs_service" "gateway" {
     container_port = 55679
   }
 
+  load_balancer {
+    target_group_arn = aws_lb_target_group.metrics.arn
+    container_name   = "${var.resource_prefix}"
+
+    container_port = 8888
+  }
+
   depends_on = [
     aws_iam_role.task,
     aws_lb_target_group.otlp,
     aws_lb_target_group.jaeger_ui,
     aws_lb_target_group.telemetry,
+    aws_lb_target_group.metrics
   ]
 }
 
@@ -100,6 +108,11 @@ resource "aws_ecs_task_definition" "gateway" {
           protocol      = "tcp"
           containerPort = 55679
           hostPort      = 55679
+        },
+        {
+          protocol = "tcp"
+          containerPort = 8888
+          hostPort = 8888
         }
       ]
     },
@@ -136,9 +149,6 @@ resource "aws_ecs_task_definition" "gateway" {
     }
   ])
 
-  lifecycle {
-    ignore_changes = [container_definitions]
-  }
 }
 
 resource "aws_ssm_parameter" "honeycomb_write_key" {

@@ -45,6 +45,16 @@ resource "aws_security_group_rule" "zpage" {
   security_group_id = aws_security_group.allow_otlp.id
 }
 
+resource "aws_security_group_rule" "metrics" {
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 8888
+  to_port   = 8888
+
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.allow_otlp.id
+}
+
 resource "aws_security_group_rule" "egress" {
   type     = "egress"
   protocol = "all"
