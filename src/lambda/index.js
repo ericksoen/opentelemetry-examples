@@ -11,10 +11,10 @@ module.exports.handler = async (event) => {
  
  console.log(`The current parent span = ${parentSpan.isRecording()}`);
  console.log(`The current parent span = ${parentSpan.spanContext().traceId}`);
- let body = JSON.parse(event.body)
+ console.log(`The received event = ${JSON.stringify(event)}`);
  console.log(`The traceId environment variable = ${process.env["_X_AMZN_TRACE_ID"]}`)
 
- let event_type = body.type
+ let event_type = "CONST"
  parentSpan.setAttribute('event_type', event_type);
  parentSpan.updateName('tracer-override');
 
@@ -25,6 +25,9 @@ module.exports.handler = async (event) => {
  span.end();
  return {
    statusCode: 200,
+   headers: {
+       'Content-Type': "application/json",
+   },
    body: JSON.stringify(
      {
        message: `The event type = ${event_type}`,
