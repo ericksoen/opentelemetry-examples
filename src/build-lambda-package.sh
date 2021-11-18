@@ -9,8 +9,9 @@ mkdir -p $ARTIFACT_DIR
 
 pushd lambda
 
-cp main.py config.yaml -t $ARTIFACT_DIR
-python -m pip install -r requirements.txt -t $ARTIFACT_DIR
+npm install 
+cp *.js config.yaml package.json -t $ARTIFACT_DIR
+cp -r node_modules/ -t $ARTIFACT_DIR
 
 popd
 

@@ -1,3 +1,4 @@
+# Python artifacs
 .venv
 .env
 dist
@@ -13,3 +14,5 @@ terraform.tfstate*
 # Auto-generated bootstrap script
 template.sh
 
+# Node artifacts
+node_modules
