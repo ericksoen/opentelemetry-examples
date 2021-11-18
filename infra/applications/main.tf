@@ -53,3 +53,14 @@ module "lambda" {
 
     vpc_id = data.aws_vpc.vpc.id
 }
+
+module "proxy" {
+    source = "./proxy"
+
+    resource_prefix = var.resource_prefix
+    target_base_url = "https://${module.app.record_name}"
+    subnet_ids = data.aws_subnet_ids.private.ids
+    source_security_group_id = aws_security_group.alb_sg.id
+
+    vpc_id = data.aws_vpc.vpc.id
+}
