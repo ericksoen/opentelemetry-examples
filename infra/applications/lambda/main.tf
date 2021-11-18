@@ -2,20 +2,25 @@ resource "aws_lambda_function" "lambda" {
   filename      = "${path.module}/../../../src/dist/otlp_lambda.zip"
   function_name = "${var.resource_prefix}-lambda"
   role          = aws_iam_role.iam_for_lambda.arn
-  handler       = "main.handler"
+  handler       = "index.handler"
 
   source_code_hash = filebase64sha256("${path.module}/../../../src/dist/otlp_lambda.zip")
 
-  runtime     = "python3.8"
+  runtime     = "nodejs12.x"
   memory_size = 512
   timeout     = 10
-  layers      = ["arn:aws:lambda:${var.region_name}:901920570463:layer:aws-otel-python38-ver-1-3-0:1"]
+  layers      = ["arn:aws:lambda:${var.region_name}:901920570463:layer:aws-otel-nodejs-ver-1-0-0:1"]
 
   environment {
     variables = {
       OPENTELEMETRY_COLLECTOR_CONFIG_FILE = "/var/task/config.yaml"
-      AWS_LAMBDA_EXEC_WRAPPER             = "/opt/otel-instrument"
       OTLP_GATEWAY_HOST                   = var.otlp_hostname
+      NODE_OPTIONS = "--require lambda-wrapper"
+
+      # From observationsd, using the AWS_LAMBDA_EXEC_WRAPPER and the packaged lambda-wrapper.js
+      # provide a similar function. At development time, the AWS_LAMBDA_EXEC_WRAPPER provided
+      # less consistent results. See also: https://dev.to/aspecto/how-to-use-opentelemetry-with-aws-lambda-87l
+      # AWS_LAMBDA_EXEC_WRAPPER             = "/opt/otel-instrument"
     }
   }
 

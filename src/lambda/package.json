@@ -1,0 +1,25 @@
+{
+  "name": "lambda-otel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@opentelemetry/api": "1.0.2",
+    "@opentelemetry/auto-instrumentations-node": "0.25.0",
+    "@opentelemetry/exporter-collector": "^0.25.0",
+    "@opentelemetry/instrumentation": "0.25.0",
+    "@opentelemetry/instrumentation-aws-lambda": "0.25.0",
+    "@opentelemetry/instrumentation-http": "0.25.0",
+    "@opentelemetry/resources": "^1.0.1",
+    "@opentelemetry/sdk-trace-base": "0.25.0",
+    "@opentelemetry/sdk-trace-node": "0.25.0",
+    "@opentelemetry/sdk-trace-web": "^1.0.1",
+    "@opentelemetry/semantic-conventions": "^1.0.1",
+    "axios": "^0.24.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
