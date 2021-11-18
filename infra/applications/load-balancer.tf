@@ -37,6 +37,22 @@ data "template_file" "homepage" {
   }
 }
 
+resource "aws_lb_listener_rule" "proxy" {
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 99
+
+  action {
+    type             = "forward"
+    target_group_arn = module.proxy.target_group_arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/proxy"]
+    }
+  }
+}
+
 resource "aws_lb_listener_rule" "ecs" {
   listener_arn = aws_lb_listener.https.arn
   priority     = 100

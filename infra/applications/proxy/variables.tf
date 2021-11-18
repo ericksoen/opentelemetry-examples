@@ -1,0 +1,19 @@
+variable "resource_prefix" {
+    description = "The prefix to associate with all the resources"
+}
+
+variable "subnet_ids" {
+    description = "The permitted subnets for the instance"
+    type = list(string)
+}
+
+variable "target_base_url" {
+    description = "The base url, e.g., https://domain.com to use as the proxy target" 
+}
+variable "source_security_group_id" {
+    description = "The security group id to permit traffic from"
+}
+
+variable "vpc_id" {
+    description = "The VPC for the instance"
+}
