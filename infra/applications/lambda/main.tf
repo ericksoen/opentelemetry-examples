@@ -14,9 +14,13 @@ resource "aws_lambda_function" "lambda" {
   environment {
     variables = {
       OPENTELEMETRY_COLLECTOR_CONFIG_FILE = "/var/task/config.yaml"
-      # AWS_LAMBDA_EXEC_WRAPPER             = "/opt/otel-instrument"
       OTLP_GATEWAY_HOST                   = var.otlp_hostname
       NODE_OPTIONS = "--require lambda-wrapper"
+
+      # From observationsd, using the AWS_LAMBDA_EXEC_WRAPPER and the packaged lambda-wrapper.js
+      # provide a similar function. At development time, the AWS_LAMBDA_EXEC_WRAPPER provided
+      # less consistent results. See also: https://dev.to/aspecto/how-to-use-opentelemetry-with-aws-lambda-87l
+      # AWS_LAMBDA_EXEC_WRAPPER             = "/opt/otel-instrument"
     }
   }
 
