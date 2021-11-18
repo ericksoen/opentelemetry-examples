@@ -18,9 +18,9 @@ resource "aws_ecs_service" "gateway" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = data.aws_subnet_ids.private.ids
+    subnets          = data.aws_subnet_ids.subnets.ids
     security_groups  = [aws_security_group.allow_otlp.id]
-    assign_public_ip = false
+    assign_public_ip = true
   }
 
   load_balancer {
@@ -37,11 +37,18 @@ resource "aws_ecs_service" "gateway" {
     container_port = 16686
   }
 
-  # TODO: Fix depends on
+  load_balancer {
+    target_group_arn = aws_lb_target_group.telemetry.arn
+    container_name   = "${var.resource_prefix}"
+
+    container_port = 55679
+  }
+
   depends_on = [
     aws_iam_role.task,
     aws_lb_target_group.otlp,
-    aws_lb_target_group.jaeger_ui
+    aws_lb_target_group.jaeger_ui,
+    aws_lb_target_group.telemetry,
   ]
 }
 
@@ -88,6 +95,11 @@ resource "aws_ecs_task_definition" "gateway" {
           protocol      = "tcp"
           containerPort = 13133
           hostPort      = 13133
+        },
+        {
+          protocol      = "tcp"
+          containerPort = 55679
+          hostPort      = 55679
         }
       ]
     },

@@ -23,4 +23,5 @@ Outputs:
 
 jaeger_hostname = "jaeger.domain.com"
 otlp_hostname = "otlp.domain.com"
+telemetry_hostname = "telemetry.domain.com"
 ```

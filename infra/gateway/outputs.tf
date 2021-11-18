@@ -5,3 +5,7 @@ output "otlp_hostname" {
 output "jaeger_hostname" {
     value = module.jaeger.record_name
 }
+
+output "telemetry_hostname" {
+    value = module.telemetry.record_name
+}
