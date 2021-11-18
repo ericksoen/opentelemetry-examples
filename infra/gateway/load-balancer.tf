@@ -17,7 +17,7 @@ resource "aws_lb_listener" "otlp" {
 }
 
 resource "aws_lb_target_group" "otlp" {
-  name     = "${var.resource_prefix}-insecure-tg"
+  name     = "${var.resource_prefix}-tg"
   port     = 4317
   protocol = "TCP"
   vpc_id   = data.aws_vpc.vpc.id
