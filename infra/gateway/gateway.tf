@@ -149,6 +149,9 @@ resource "aws_ecs_task_definition" "gateway" {
     }
   ])
 
+  lifecycle {
+    ignore_changes = [container_definitions]
+  }
 }
 
 resource "aws_ssm_parameter" "honeycomb_write_key" {
