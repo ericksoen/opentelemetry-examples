@@ -53,6 +53,10 @@ variable "jaeger_subdomain" {
   default     = "jaeger"
 }
 
+variable "telemetry_subdomain" {
+  description = "The subdomain to review OpenCollector agent telemetry"
+  default = "telemetry"
+}
 variable "bearer_token_issuer_url" {
   description = "The URL used to validate a bearer token"
 }
