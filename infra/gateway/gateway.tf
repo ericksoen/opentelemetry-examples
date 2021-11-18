@@ -18,9 +18,9 @@ resource "aws_ecs_service" "gateway" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = data.aws_subnet_ids.subnets.ids
+    subnets          = data.aws_subnet_ids.private.ids
     security_groups  = [aws_security_group.allow_otlp.id]
-    assign_public_ip = true
+    assign_public_ip = false
   }
 
   load_balancer {

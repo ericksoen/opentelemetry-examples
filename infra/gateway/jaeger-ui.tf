@@ -17,15 +17,23 @@ resource "aws_lb_listener" "jaeger" {
   }
 }
 
-resource "aws_lb_listener" "telemetry" {
-  load_balancer_arn = aws_lb.jaeger.id
-  port              = "8443"
-  protocol          = "HTTPS"
-  certificate_arn   = module.telemetry.certificate_arn
-  default_action {
-    type             = "forward"
+resource "aws_lb_listener_rule" "debug" {
+  listener_arn = aws_lb_listener.jaeger.arn
+  priority = 1
+  action {
+    type = "forward"
     target_group_arn = aws_lb_target_group.telemetry.arn
   }
+
+  condition {
+    path_pattern {
+      values = ["/debug/*"]
+    }
+  }
+}
+resource "aws_lb_listener_certificate" "telemetry" {
+  listener_arn = aws_lb_listener.jaeger.arn
+  certificate_arn = module.telemetry.certificate_arn
 }
 
 resource "aws_lb_target_group" "telemetry" {
@@ -36,10 +44,12 @@ resource "aws_lb_target_group" "telemetry" {
   vpc_id      = data.aws_vpc.vpc.id
 
   health_check {
+    enabled = true
     port = 13133
     healthy_threshold = 2
     unhealthy_threshold = 2
-    interval = 10    
+    interval = 10
+    
   }
 }
 
@@ -63,16 +73,6 @@ resource "aws_security_group_rule" "https" {
   protocol  = "tcp"
   from_port = 443
   to_port   = 443
-
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.jaeger.id
-}
-
-resource "aws_security_group_rule" "https_2" {
-  type      = "ingress"
-  protocol  = "tcp"
-  from_port = 8443
-  to_port   = 8443
 
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.jaeger.id
