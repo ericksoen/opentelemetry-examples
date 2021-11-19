@@ -10,6 +10,10 @@ variable "subnet_ids" {
 variable "target_base_url" {
     description = "The base url, e.g., https://domain.com to use as the proxy target" 
 }
+
+variable "http_trace_gateway_base_url" {
+    description = "The base url, e.g., https://domain.com to use to send OTLP telemetry over HTTP" 
+}
 variable "source_security_group_id" {
     description = "The security group id to permit traffic from"
 }

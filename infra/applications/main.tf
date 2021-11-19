@@ -59,6 +59,7 @@ module "proxy" {
 
     resource_prefix = var.resource_prefix
     target_base_url = "https://${module.app.record_name}"
+    http_trace_gateway_base_url = "https://otlp-http.${var.domain}"
     subnet_ids = data.aws_subnet_ids.private.ids
     source_security_group_id = aws_security_group.alb_sg.id
 
