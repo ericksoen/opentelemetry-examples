@@ -3,22 +3,32 @@ import json
 import os
 import secrets
 import time
-
-from requests.api import head
+import random
 
 TARGET_BASE_URL = os.getenv("TARGET_BASE_URL")
 HTTP_TRACE_GATEWAY_URL = os.getenv("HTTP_TRACE_GATEWAY_URL")
 
-BAD_REQUEST_MESSAGE = {
-            "statusCode": 400,
-            "headers": {
-                "content-type": "application/json",
-            },
-            "body": json.dumps({"message": "bad request"})
-        }
+AUTH_ERROR_MESSAGE = {"statusCode": 401, "message": "unauthorized"}
 
-def span_factory(trace_id, span_id, start_time_unix_nano, end_time_unix_nano):
-    return {
+BAD_REQUEST_MESSAGE = {"statusCode": 400, "message": "bad request"}
+
+DEFAULT_RESPONSE = {
+    "headers": {
+        "content-type": "application/json"
+    }
+}
+FAULT_FREQUENCY = random.randint(10, 20)
+
+invocation_count = 0
+
+class AuthorizationError(Exception):
+    pass
+
+class BadRequestError(Exception):
+    pass
+
+def span_factory(trace_id, span_id, start_time_unix_nano, end_time_unix_nano, status_code):
+    body =  {
     "resourceSpans": [
         {
             "resource": {
@@ -43,6 +53,12 @@ def span_factory(trace_id, span_id, start_time_unix_nano, end_time_unix_nano):
                             "value": {
                                 "stringValue": "GET"
                             }
+                        },
+                        {
+                            "key": "http.status_code",
+                            "value": {
+                                "intValue": status_code,
+                            }
                         }],
                         "droppedAttributesCount": 0,
                         "events": [],
@@ -58,55 +74,81 @@ def span_factory(trace_id, span_id, start_time_unix_nano, end_time_unix_nano):
             }]
         }
     ]
-}
+    }
+
+    return json.dumps(body)
 def handler(event, context):
 
-    params = event.get("queryStringParameters")
+    # Work around the fact that the handler isn't able
+    # to mutate this counter function without declaring
+    # it as global
+    global invocation_count
+    invocation_count +=1 
 
-    if not params:
-        print(f"Expected event key \"queryStringParameters\" not set.")
-        return BAD_REQUEST_MESSAGE
+    message_response = DEFAULT_RESPONSE.copy()
+    try:
 
-    target = params.get("target")
+        trace_id = secrets.token_hex(16)
+        span_id = secrets.token_hex(8)
 
-    if not target:
-        print(f"Expected event key \"queryStringParameters.target\" not set")
-        return BAD_REQUEST_MESSAGE
+        # Generate a w3c traceparent header and inject into downstream
+        # service calls
+        headers = {
+            "traceparent": f"00-{trace_id}-{span_id}-01",
+            "content-type": "application/json"
+        }
 
-    target = target.lower()
-    if target not in ['ecs', 'ec2', 'lambda']:
-        print(F"Expected one of [\"ecs\", \"ecs\", \"lambda\"]. Got {target}.")
-        return BAD_REQUEST_MESSAGE
-    
-    trace_id = secrets.token_hex(16)
-    span_id = secrets.token_hex(8)
+        start_time = time.time_ns()
 
-    headers = {
-        "traceparent": f"00-{trace_id}-{span_id}-01",
-        "content-type": "application/json"
-    }
+        print(f"The invocation count = {invocation_count} with FAULT_FREQUENCY = {FAULT_FREQUENCY}")
+        if (invocation_count % FAULT_FREQUENCY)  == 0:
+            message_response.update(AUTH_ERROR_MESSAGE)
+            raise AuthorizationError("User is not authorized")
 
-    start_time = time.time_ns()
+        params = event.get("queryStringParameters")
 
-    resp = requests.get(f"{TARGET_BASE_URL}/{target}", headers = headers)
-    end_time = time.time_ns()
+        if not params:
+            message_response.update(BAD_REQUEST_MESSAGE)
+            raise BadRequestError(f"Expected event key \"queryStringParameters\" not set.")
 
-    client_body = resp.json()
-    client_body["trace_id"] = trace_id
-    client_body["span_id"] = span_id
+        target = params.get("target")
 
-    otlp_http_body = span_factory(trace_id, span_id, start_time, end_time)
+        if not target:
+            message_response.update(BAD_REQUEST_MESSAGE)
+            raise BadRequestError(f"Expected event key \"queryStringParameters.target\" not set")
 
-    trace_resp = requests.post(f"{HTTP_TRACE_GATEWAY_URL}/v1/traces", data = json.dumps(otlp_http_body), headers = {
-    "Content-Type": "application/json"
-    })
+        target = target.lower()
+        if target not in ['ecs', 'ec2', 'lambda']:
+            message_response.update(BAD_REQUEST_MESSAGE)
+            raise BadRequestError(F"Expected one of [\"ecs\", \"ecs\", \"lambda\"]. Got {target}.")
 
-    if trace_resp.status_code != 200:
-        print(f"Expected 200 status code. Received {resp.status_code} with body = {json.dumps(resp.json())}")
-    return {
-        "statusCode": 200,
-        "headers": {
-            "Content-Type": "application/json"
-        },
-        "body": json.dumps(client_body)
-    }
+        resp = requests.get(f"{TARGET_BASE_URL}/{target}", headers = headers)
+
+        client_body = resp.json()
+        client_body["trace_id"] = trace_id
+        client_body["span_id"] = span_id
+        message_response.update({"statusCode": 200, "body": json.dumps(client_body)})
+
+    except BadRequestError as e:
+        print(e)
+    except AuthorizationError as e:
+        print(e)
+    finally:
+        end_time = time.time_ns()
+        otlp_http_body = span_factory(trace_id, span_id, start_time, end_time, message_response["statusCode"])
+        print(f"The span body = {otlp_http_body}")
+        print(f"The message body = {json.dumps(message_response)}")
+        trace_resp = requests.post(f"{HTTP_TRACE_GATEWAY_URL}/v1/traces", data = otlp_http_body, headers = {
+        "Content-Type": "application/json"
+        })
+
+        # Observe that the error happened but don't interrupt client flow
+        # Ideally, this would happen as a background thread so that it didn't
+        # impact client latency as well
+        if trace_resp.status_code != 200:
+            print(f"Expected 200 status code. Received {resp.status_code} with body = {json.dumps(resp.json())}")
+
+        return message_response
+
+
+
