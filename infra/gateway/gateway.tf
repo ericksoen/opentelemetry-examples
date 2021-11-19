@@ -31,6 +31,13 @@ resource "aws_ecs_service" "gateway" {
   }
 
   load_balancer {
+    target_group_arn = aws_lb_target_group.otlp_http.arn
+    container_name   = "${var.resource_prefix}"
+
+    container_port = 4318
+  }
+
+  load_balancer {
     target_group_arn = aws_lb_target_group.jaeger_ui.arn
     container_name   = "${var.resource_prefix}-jaeger"
 
@@ -56,7 +63,8 @@ resource "aws_ecs_service" "gateway" {
     aws_lb_target_group.otlp,
     aws_lb_target_group.jaeger_ui,
     aws_lb_target_group.telemetry,
-    aws_lb_target_group.metrics
+    aws_lb_target_group.metrics,
+    aws_lb_target_group.otlp_http
   ]
 }
 
@@ -98,6 +106,11 @@ resource "aws_ecs_task_definition" "gateway" {
           protocol      = "tcp"
           containerPort = 4317
           hostPort      = 4317
+        },
+        {
+          protocol      = "tcp"
+          containerPort = 4318
+          hostPort      = 4318
         },
         {
           protocol      = "tcp"

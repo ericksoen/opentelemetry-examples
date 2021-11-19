@@ -13,6 +13,7 @@ resource "aws_lambda_function" "lambda" {
   environment {
     variables = {
       TARGET_BASE_URL = var.target_base_url
+      HTTP_TRACE_GATEWAY_URL = var.http_trace_gateway_base_url
     }
   }
 

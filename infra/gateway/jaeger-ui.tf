@@ -19,7 +19,7 @@ resource "aws_lb_listener" "jaeger" {
 
 resource "aws_lb_listener_rule" "debug" {
   listener_arn = aws_lb_listener.jaeger.arn
-  priority = 1
+  priority = 4
   action {
     type = "forward"
     target_group_arn = aws_lb_target_group.telemetry.arn
@@ -34,7 +34,7 @@ resource "aws_lb_listener_rule" "debug" {
 
 resource "aws_lb_listener_rule" "metrics" {
   listener_arn = aws_lb_listener.jaeger.arn
-  priority = 2
+  priority = 5
   action {
     type = "forward"
     target_group_arn = aws_lb_target_group.metrics.arn
@@ -46,9 +46,30 @@ resource "aws_lb_listener_rule" "metrics" {
     }
   }
 }
+
+resource "aws_lb_listener_rule" "otlp_http" {
+  listener_arn = aws_lb_listener.jaeger.arn
+  priority = 6
+
+  action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.otlp_http.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/v1/traces"]
+    }
+  }
+}
 resource "aws_lb_listener_certificate" "telemetry" {
   listener_arn = aws_lb_listener.jaeger.arn
   certificate_arn = module.telemetry.certificate_arn
+}
+
+resource "aws_lb_listener_certificate" "otlp_http" {
+  listener_arn = aws_lb_listener.jaeger.arn
+  certificate_arn = module.otlp_http.certificate_arn
 }
 
 resource "aws_lb_target_group" "telemetry" {
@@ -65,6 +86,22 @@ resource "aws_lb_target_group" "telemetry" {
     unhealthy_threshold = 2
     interval = 10
     
+  }
+}
+
+resource "aws_lb_target_group" "otlp_http" {
+  name     = "${var.resource_prefix}-otlp-http-tg"
+  port     = 4318
+  protocol = "HTTP"
+  vpc_id   = data.aws_vpc.vpc.id
+
+  target_type = "ip"
+
+  health_check {
+    port = 13133
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    interval = 10    
   }
 }
 
