@@ -1,5 +1,7 @@
-import flask
+from flask import Flask, request, jsonify
 import requests
+import random
+import time
 import os
 
 from opentelemetry import trace
@@ -12,6 +14,8 @@ from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
 import boto3
 
+MIN_LATENCY_MS = 1800
+MAX_LATENCY_MS = 3100
 raw = requests.get('http://169.254.169.254/latest/dynamic/instance-identity/document')
 
 instance_data = raw.json()
@@ -43,7 +47,7 @@ trace.get_tracer_provider().add_span_processor(span_processor)
 
 tracer = trace.get_tracer(__name__)
 
-app = flask.Flask(__name__)
+app = Flask(__name__)
 FlaskInstrumentor().instrument_app(app)
 RequestsInstrumentor().instrument()
 
@@ -53,7 +57,22 @@ def status():
     
 @app.route("/ec2")
 def hello():
-    tracer = trace.get_tracer(__name__)
+
+    faults = request.headers['x-fault'] if request.headers.get('x-fault') else "00"
+
+    if len(faults):
+        print("Invalid fault length. Skipping fault injection")
+
+    is_latency_fault = faults[0] == "1"
+    is_server_error_fault = faults[1] == "1"
+
+    latency_ms = random.randint(MIN_LATENCY_MS, MAX_LATENCY_MS) if is_latency_fault else 0
+
+    time.sleep(latency_ms / 1000)
+
+    if is_server_error_fault:
+        return jsonify({"message": "internal server error"}), 502
+
     with tracer.start_as_current_span("invoke-lambda") as span:
         requests.get(lambda_target)
     return {"otlp_target": otlp_target}
