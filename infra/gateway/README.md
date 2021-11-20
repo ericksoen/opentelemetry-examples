@@ -10,7 +10,6 @@ This infrastructure creates the OpenTelemetry Gateway collector as an ECS task r
 |vpc_filters||
 |subnet_filters||
 |private_subnet_filters||
-|image_repository||
 |default_tags||
 |honeycomb_write_key||
 |honeycomb_dataset||

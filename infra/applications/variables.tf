@@ -36,7 +36,7 @@ variable "app_subdomain" {
 }
 
 variable "otlp_hostname" {
-  description = "The URL to send OTLP traffic without an auth token"
+  description = "The URL for OTLP traffic"
 }
 
 variable "jaeger_ui_hostname" {

@@ -49,6 +49,15 @@ resource "aws_ecs_service" "ecs" {
 
 }
 
+locals {
+
+  # As of 11/20/21, versions subsequent to v0.13.0 do not correctly
+  # expand environment variables and instead treat them as string literals
+  # Pin to the last known working version until the issue is resolved
+  # See: https://github.com/aws-observability/aws-otel-collector/issues/748
+  aws_otel_collector_image_version = "v0.13.0"
+}
+
 resource "aws_ecs_task_definition" "app" {
   family                   = "${var.resource_prefix}"
   network_mode             = "awsvpc"
@@ -96,7 +105,7 @@ resource "aws_ecs_task_definition" "app" {
     },
     {
       name      = "${var.resource_prefix}-agent"
-      image     = "${var.image_repository_name}:agent"
+      image     = "amazon/aws-otel-collector:${local.aws_otel_collector_image_version}"
       essential = true
       logConfiguration = {
         logDriver = "awslogs"
@@ -107,10 +116,10 @@ resource "aws_ecs_task_definition" "app" {
           awslogs-stream-prefix = "agent"
         }
       },
-      environment = [
+      secrets = [
         {
-          "name" : "OTLP_GATEWAY_HOST",
-          "value" : "${var.otlp_hostname}"
+          "name": "AOT_CONFIG_CONTENT",
+          "valueFrom": aws_ssm_parameter.agent_config.arn
         }
       ]
       portMappings = [
@@ -123,7 +132,4 @@ resource "aws_ecs_task_definition" "app" {
     }
   ])
 
-  lifecycle {
-    ignore_changes = [container_definitions]
-  }
 }
