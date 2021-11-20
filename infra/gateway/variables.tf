@@ -18,10 +18,6 @@ variable "private_subnet_filters" {
   type        = map(any)
 }
 
-variable "image_repository" {
-  description = "The image id to use"
-}
-
 variable "default_tags" {
   description = "The tags to assign to all resources"
 }

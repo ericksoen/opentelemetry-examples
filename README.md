@@ -51,7 +51,6 @@ Before you deploy any application infrastructure, you first need to create the i
 
 Creating the images and packages can be executed in any sequence, but the recommendation is to follow the same order used to deploy the infrastructure:
 
-1. OpenTelemetry Gateway Collector image
 1. OpenTelemetry Agent Collector image
 1. Build Application
    +  Note: this currently excludes the application build process for the EC2 service endpoint, which is packaged during the infrastructure deployment as S3 objects and then installed as part of application bootstrapping

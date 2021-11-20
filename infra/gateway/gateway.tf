@@ -68,6 +68,14 @@ resource "aws_ecs_service" "gateway" {
   ]
 }
 
+locals {
+
+  # As of 11/20/21, versions subsequent to v0.13.0 do not correctly
+  # expand environment variables and instead treat them as string literals
+  # Pin to the last known working version until the issue is resolved
+  # See: https://github.com/aws-observability/aws-otel-collector/issues/748
+  aws_otel_collector_image_version = "v0.13.0"
+}
 resource "aws_ecs_task_definition" "gateway" {
   family                   = "${var.resource_prefix}"
   network_mode             = "awsvpc"
@@ -77,10 +85,11 @@ resource "aws_ecs_task_definition" "gateway" {
   cpu                      = 1024
   memory                   = 2048
 
+
   container_definitions = jsonencode([
     {
       name      = "${var.resource_prefix}"
-      image     = "${var.image_repository}:dev"
+      image     = "amazon/aws-otel-collector:${local.aws_otel_collector_image_version}"
       essential = true
       logConfiguration = {
         logDriver = "awslogs"
@@ -93,13 +102,17 @@ resource "aws_ecs_task_definition" "gateway" {
       },
       secrets = [
         {
+          "name" : "HONEYCOMB_DATASET",
+          "valueFrom" : aws_ssm_parameter.honeycomb_dataset.arn
+        },
+        {
           "name" : "HONEYCOMB_WRITE_KEY",
           "valueFrom" : aws_ssm_parameter.honeycomb_write_key.arn
         },
         {
-          "name" : "HONEYCOMB_DATASET",
-          "valueFrom" : aws_ssm_parameter.honeycomb_dataset.arn
-        }
+          "name": "AOT_CONFIG_CONTENT",
+          "valueFrom": aws_ssm_parameter.gateway_config.arn
+        },
       ]
       portMappings = [
         {
@@ -162,19 +175,7 @@ resource "aws_ecs_task_definition" "gateway" {
     }
   ])
 
-  lifecycle {
-    ignore_changes = [container_definitions]
-  }
-}
-
-resource "aws_ssm_parameter" "honeycomb_write_key" {
-  name  = "/${var.resource_prefix}/honeycomb-write-key"
-  type  = "String"
-  value = var.honeycomb_write_key
-}
-
-resource "aws_ssm_parameter" "honeycomb_dataset" {
-  name  = "/${var.resource_prefix}/honeycomb-dataset"
-  type  = "String"
-  value = var.honeycomb_dataset
+  # lifecycle {
+  #   ignore_changes = [container_definitions]
+  # }
 }
