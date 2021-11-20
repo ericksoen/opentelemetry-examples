@@ -31,6 +31,26 @@ registerInstrumentations({
  instrumentations: [
    getNodeAutoInstrumentations(),
    new AwsLambdaInstrumentation({
+     requestHook: (span, {event, context}) => {
+
+      if ('path' in event) {
+        span.setAttribute("http.route",  event.path);
+      }
+
+      if ('httpMethod' in event) {
+        span.setAttribute("http.method", event.httpMethod)
+      }
+      
+     },
+     responseHook: (span, {error, res}) => {
+      if (error instanceof Error) {
+        span.setAttribute('faas.error', error.message);
+      }
+
+      if (res) {
+        span.setAttribute('http.status_code', res.statusCode);
+      }
+     },
      disableAwsContextPropagation: true
    })
  ],
