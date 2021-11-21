@@ -16,16 +16,20 @@ exporters:
   #   insecure: true
   logging:
     logLevel: debug
-  otlp:
+  %{ if ENABLE_HONEYCOMB_BASE }
+  otlp/hc:
     endpoint: "api.honeycomb.io:443"
     headers:
-      "x-honeycomb-team": $${HONEYCOMB_WRITE_KEY}
+      "x-honeycomb-team": $${HONEYCOMB_BASE_WRITE_KEY}
       "x-honeycomb-dataset": ${HONEYCOMB_BASE_DATASET}
+  %{ endif }
+  %{ if ENABLE_HONEYCOMB_REFINERY }
   otlphttp:
-    endpoint: "${REFINERY_URL}"
+    endpoint: "${HONEYCOMB_REFINERY_URL}"
     headers:
-      'x-honeycomb-team': "$${HONEYCOMB_WRITE_KEY}"
-      'x-honeycomb-dataset': "${HONEYCOMB_REFINERY_DATASET}"      
+      'x-honeycomb-team': "$${HONEYCOMB_REFINERY_WRITE_KEY}"
+      'x-honeycomb-dataset': "${HONEYCOMB_REFINERY_DATASET}"     
+  %{ endif }
 processors:
   attributes/insert:
     actions:
@@ -39,4 +43,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch, attributes/insert]
-      exporters: [logging, otlp, otlphttp]
+      exporters: ${EXPORTERS}

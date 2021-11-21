@@ -100,16 +100,7 @@ resource "aws_ecs_task_definition" "gateway" {
           awslogs-stream-prefix = "collector"
         }
       },
-      secrets = [
-        {
-          "name" : "HONEYCOMB_WRITE_KEY",
-          "valueFrom" : aws_ssm_parameter.honeycomb_write_key.arn
-        },
-        {
-          "name": "AOT_CONFIG_CONTENT",
-          "valueFrom": aws_ssm_parameter.gateway_config.arn
-        },
-      ]
+      secrets = local.combined_gateway_secrets,
       portMappings = [
         {
           protocol      = "tcp"

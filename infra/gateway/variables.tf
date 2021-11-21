@@ -22,21 +22,45 @@ variable "default_tags" {
   description = "The tags to assign to all resources"
 }
 
-variable "honeycomb_write_key" {
-  description = "The write key to provide as a secret"
+
+variable "honeycomb_base_config" {
+  type = object({
+    write_key = string
+    dataset_name = string
+  })
+
+  default = {
+    dataset_name = ""
+    write_key = ""
+  }
+
+  validation {
+    condition = (var.honeycomb_base_config.dataset_name != "" ? var.honeycomb_base_config.write_key != "" : true)
+    error_message = "A write key must be provided with a dataset name."
+  }
 }
 
-variable "honeycomb_dataset" {
-  description = "The honeycomb dataset target for unsampled traces"
-}
+variable "honeycomb_refinery_config" {
+  type = object({
+    write_key = string
+    dataset_name = string
+  })
 
-variable "honeycomb_refinery_dataset" {
-  description = "The honeycomb dataset target for traces sampled by refinery"
+  default = {
+    dataset_name = ""
+    write_key = ""
+  }
+
+  validation {
+    condition = (var.honeycomb_refinery_config.dataset_name != "" ? var.honeycomb_refinery_config.write_key != "" : true)
+    error_message = "A write key must be provided with a dataset name."
+  }
 }
 
 variable "domain" {
   description = "The name of the domain to associate with resources"
 }
+
 
 variable "otlp_subdomain" {
   description = "The subdomain for OTLP traffic"
