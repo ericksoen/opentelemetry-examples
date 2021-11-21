@@ -27,7 +27,11 @@ variable "honeycomb_write_key" {
 }
 
 variable "honeycomb_dataset" {
-  description = "The honeycomb dataset to provide as a secret"
+  description = "The honeycomb dataset target for unsampled traces"
+}
+
+variable "honeycomb_refinery_dataset" {
+  description = "The honeycomb dataset target for traces sampled by refinery"
 }
 
 variable "domain" {

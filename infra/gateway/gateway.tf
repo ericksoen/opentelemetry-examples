@@ -102,10 +102,6 @@ resource "aws_ecs_task_definition" "gateway" {
       },
       secrets = [
         {
-          "name" : "HONEYCOMB_DATASET",
-          "valueFrom" : aws_ssm_parameter.honeycomb_dataset.arn
-        },
-        {
           "name" : "HONEYCOMB_WRITE_KEY",
           "valueFrom" : aws_ssm_parameter.honeycomb_write_key.arn
         },

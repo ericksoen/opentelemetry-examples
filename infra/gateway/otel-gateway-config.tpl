@@ -20,7 +20,12 @@ exporters:
     endpoint: "api.honeycomb.io:443"
     headers:
       "x-honeycomb-team": $${HONEYCOMB_WRITE_KEY}
-      "x-honeycomb-dataset": $${HONEYCOMB_DATASET}
+      "x-honeycomb-dataset": ${HONEYCOMB_BASE_DATASET}
+  otlphttp:
+    endpoint: "${REFINERY_URL}"
+    headers:
+      'x-honeycomb-team': "$${HONEYCOMB_WRITE_KEY}"
+      'x-honeycomb-dataset': "${HONEYCOMB_REFINERY_DATASET}"      
 processors:
   attributes/insert:
     actions:
@@ -34,4 +39,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch, attributes/insert]
-      exporters: [logging, otlp]
+      exporters: [logging, otlp, otlphttp]
