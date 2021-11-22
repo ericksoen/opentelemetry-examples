@@ -1,6 +1,8 @@
 name: terraform actions
 on: push
 defaults:
+  env:
+    tf_actions_working_dir: infra/applications
   run:
     working-directory: ${{ env.tf_actions_working_dir }}
 jobs:
@@ -16,8 +18,6 @@ jobs:
 
     - uses: actions/github-script@0.9.0
       if: github.event_name == 'pull_request'
-      env:
-        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
