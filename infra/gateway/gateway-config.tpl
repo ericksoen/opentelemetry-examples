@@ -8,9 +8,6 @@ receivers:
       grpc:
       http:
 exporters:
-  jaeger:
-    endpoint: 0.0.0.0:14250
-    insecure: true
   logging:
     logLevel: debug
   otlp/hc:
@@ -22,7 +19,15 @@ exporters:
     endpoint: "${HONEYCOMB_REFINERY_URL}"
     headers:
       'x-honeycomb-team': "$${HONEYCOMB_REFINERY_WRITE_KEY}"
-      'x-honeycomb-dataset': "${HONEYCOMB_REFINERY_DATASET}"     
+      'x-honeycomb-dataset': "${HONEYCOMB_REFINERY_DATASET}"
+  otlp/lightstep:
+    endpoint: ingest.lightstep.com:443
+    headers:
+      "lightstep-access-token": $${LIGHTSTEP_ACCESS_TOKEN}      
+  otlp/nr:
+    endpoint: otlp.nr-data.net:4317
+    headers:
+      "api-key": $${NEWRELIC_API_KEY}
 processors:
   attributes/insert:
     actions:

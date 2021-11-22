@@ -57,6 +57,25 @@ variable "honeycomb_refinery_config" {
   }
 }
 
+variable "lightstep_config" {
+  type = object({
+    access_token = string
+  })
+
+  default = {
+    access_token = ""
+  }
+}
+
+variable "newrelic_config" {
+  type = object({
+    api_key = string
+  })
+
+  default = {
+    api_key = ""
+  }
+}
 variable "domain" {
   description = "The name of the domain to associate with resources"
 }
