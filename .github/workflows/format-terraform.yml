@@ -3,8 +3,8 @@ on: push
 defaults:
   env:
     tf_actions_working_dir: infra/applications
-  run:
-    working-directory: ${{ env.tf_actions_working_dir }}
+  # run:
+  #   working-directory: ${{ env.tf_actions_working_dir }}
 jobs:
   format-terraform:
     steps:
