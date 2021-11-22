@@ -1,12 +1,13 @@
 name: terraform actions
 on: push
-defaults:
-  env:
-    tf_actions_working_dir: infra/applications
+# defaults:
+  # env:
+  #   tf_actions_working_dir: infra/applications
   # run:
   #   working-directory: ${{ env.tf_actions_working_dir }}
 jobs:
   format-terraform:
+    runs-on: ubuntu-lates
     steps:
     - uses: actions/checkout@v2
     - uses: hashicorp/setup-terraform@v1
