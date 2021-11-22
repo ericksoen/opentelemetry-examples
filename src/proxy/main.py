@@ -26,6 +26,7 @@ class AuthorizationError(Exception):
 class BadRequestError(Exception):
     pass
 
+# Note: the `service.name` property appears to be required when exporting to Lightstep or spans will be rejected
 def span_factory(trace_id, span_id, start_time_unix_nano, end_time_unix_nano, status_code, path, http_method, name = "proxy", service_name="proxy-service"):
     body =  {
     "resourceSpans": [
