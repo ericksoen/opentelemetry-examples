@@ -1,3 +1,3 @@
-image_repository = ""
-otlp_hostname = ""
+image_repository   = ""
+otlp_hostname      = ""
 jaeger_ui_hostname = ""

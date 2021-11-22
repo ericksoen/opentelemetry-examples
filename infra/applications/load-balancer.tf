@@ -29,8 +29,8 @@ data "template_file" "homepage" {
   template = file("${path.module}/homepage.template")
 
   vars = {
-    jaeger_hostname            = var.jaeger_ui_hostname
-    demo_hostname              = module.app.record_name
+    jaeger_hostname        = var.jaeger_ui_hostname
+    demo_hostname          = module.app.record_name
     root_service_path      = local.primary_rest_resource
     secondary_service_path = local.secondary_rest_resource
     tertiary_service_path  = local.tertiary_rest_resource
