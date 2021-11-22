@@ -61,6 +61,13 @@ variable "domain" {
   description = "The name of the domain to associate with resources"
 }
 
+# Jaeger exporter is currently supported in upstream OpenTelemetry collector image
+# but is not available in AWS Distro/OpenTelemetry (ADOT) image.
+# Do not enable jaeger exporter until it is avaiable. 
+# See: https://github.com/aws-observability/aws-otel-collector/issues/292
+variable "enable_jaeger" {
+  default = false
+}
 
 variable "otlp_subdomain" {
   description = "The subdomain for OTLP traffic"

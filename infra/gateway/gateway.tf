@@ -100,7 +100,7 @@ resource "aws_ecs_task_definition" "gateway" {
           awslogs-stream-prefix = "collector"
         }
       },
-      secrets = local.combined_gateway_secrets,
+      secrets = local.gateway_remote_environment_variables,
       portMappings = [
         {
           protocol      = "tcp"
