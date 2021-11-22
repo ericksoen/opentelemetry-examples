@@ -1,6 +1,7 @@
 defaults:
   run:
     working-directory: ${{ env.tf_actions_working_dir }}
+  on: [push]
 steps:
 - uses: actions/checkout@v2
 - uses: hashicorp/setup-terraform@v1
