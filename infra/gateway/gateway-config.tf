@@ -33,6 +33,14 @@ locals {
     {
       "key": "jaeger",
       "enabled": local.jaeger_enable,
+    },
+    {
+      "key": "otlp/lightstep",
+      "enabled": local.lightstep_enable
+    },
+    {
+      "key": "otlp/nr",
+      "enabled": local.newrelic_enable
     }
   ]
 }

@@ -24,6 +24,15 @@ locals {
 }
 
 locals {
+    lightstep_enable = var.lightstep_config.access_token != ""
+    
+}
+
+locals {
+    newrelic_enable = var.newrelic_config.api_key != ""
+    
+}
+locals {
   # Note: the _WRITE_KEY environment variable names in this file
   # must be identical to the $${_WRITE_KEY} variable names in the
   # gateway-config.tpl file or your exporter will not be able to make
@@ -40,6 +49,14 @@ locals {
         {
           "name" : "HONEYCOMB_REFINERY_WRITE_KEY",
           "valueFrom" : aws_ssm_parameter.honeycomb_base_write_key.arn          
+        },
+        {
+          "name": "LIGHTSTEP_ACCESS_TOKEN",
+          "valueFrom": aws_ssm_parameter.lightstep_access_token.arn
+        },
+        {
+          "name": "NEWRELIC_API_KEY",
+          "valueFrom": aws_ssm_parameter.newrelic_api_key.arn
         }
   ]
 }
