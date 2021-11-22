@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./infra/applications
+        working-directory: ./infra/gateway
     steps:
     - uses: actions/checkout@v2
     - uses: hashicorp/setup-terraform@v1
