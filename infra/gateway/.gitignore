@@ -1,0 +1,4 @@
+# Ignore the local file that we materialize 
+# as part of execution. We version control 
+# the source template instead
+refinery_rules.toml

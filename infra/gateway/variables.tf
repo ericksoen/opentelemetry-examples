@@ -22,16 +22,51 @@ variable "default_tags" {
   description = "The tags to assign to all resources"
 }
 
-variable "honeycomb_write_key" {
-  description = "The write key to provide as a secret"
+
+variable "honeycomb_base_config" {
+  type = object({
+    write_key = string
+    dataset_name = string
+  })
+
+  default = {
+    dataset_name = ""
+    write_key = ""
+  }
+
+  validation {
+    condition = (var.honeycomb_base_config.dataset_name != "" ? var.honeycomb_base_config.write_key != "" : true)
+    error_message = "A write key must be provided with a dataset name."
+  }
 }
 
-variable "honeycomb_dataset" {
-  description = "The honeycomb dataset to provide as a secret"
+variable "honeycomb_refinery_config" {
+  type = object({
+    write_key = string
+    dataset_name = string
+  })
+
+  default = {
+    dataset_name = ""
+    write_key = ""
+  }
+
+  validation {
+    condition = (var.honeycomb_refinery_config.dataset_name != "" ? var.honeycomb_refinery_config.write_key != "" : true)
+    error_message = "A write key must be provided with a dataset name."
+  }
 }
 
 variable "domain" {
   description = "The name of the domain to associate with resources"
+}
+
+# Jaeger exporter is currently supported in upstream OpenTelemetry collector image
+# but is not available in AWS Distro/OpenTelemetry (ADOT) image.
+# Do not enable jaeger exporter until it is avaiable. 
+# See: https://github.com/aws-observability/aws-otel-collector/issues/292
+variable "enable_jaeger" {
+  default = false
 }
 
 variable "otlp_subdomain" {
