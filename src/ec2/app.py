@@ -3,6 +3,7 @@ import requests
 import random
 import time
 import os
+import json
 
 from opentelemetry import trace
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
@@ -14,8 +15,8 @@ from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
 import boto3
 
-MIN_LATENCY_MS = 1800
-MAX_LATENCY_MS = 3100
+MIN_LATENCY_MS = 600
+MAX_LATENCY_MS = 1500
 raw = requests.get('http://169.254.169.254/latest/dynamic/instance-identity/document')
 
 instance_data = raw.json()
@@ -73,6 +74,9 @@ def hello():
     if is_server_error_fault:
         return jsonify({"message": "internal server error"}), 502
 
+    normal_latency_ms = random.randint(100, 250)
     with tracer.start_as_current_span("invoke-lambda") as span:
-        requests.get(lambda_target)
-    return {"otlp_target": otlp_target}
+        time.sleep(normal_latency_ms / 1000)
+        
+        resp = requests.get(lambda_target)
+        return {"otlp_target": otlp_target, "lambda_response": resp.json()}

@@ -3,8 +3,8 @@
 const axios = require('axios');
 const opentelemetry = require('@opentelemetry/api');
 const sleep = require('util').promisify(setTimeout);
-const MIN_DELAY_MS = 2500;
-const MAX_DELAY_MS = 5000;
+const MIN_DELAY_MS = 750;
+const MAX_DELAY_MS = 1200;
 
 const tracer = opentelemetry.trace.getTracer('example-basic-tracer-node');
 module.exports.handler = async (event) => {
@@ -22,7 +22,6 @@ module.exports.handler = async (event) => {
     ? Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS) + MIN_DELAY_MS
     : 0;
   await sleep(timeout_ms);
-
   if (is_internal_server_fault) {
     return {
       statusCode: 502,
@@ -34,20 +33,25 @@ module.exports.handler = async (event) => {
       }),
     };
   }
-  const todoItem = await axios('https://jsonplaceholder.typicode.com/todos/1');
+
+  const todo_id = 1;
+  const todoItem = await axios(
+    `https://jsonplaceholder.typicode.com/todos/${todo_id}`
+  );
 
   const parentSpan = opentelemetry.trace.getSpan(
     opentelemetry.context.active()
   );
 
-  let event_type = 'CONST';
-  parentSpan.setAttribute('event_type', event_type);
-  parentSpan.updateName('tracer-override');
+  parentSpan.updateName('resolve-todos');
+  parentSpan.setAttribute('todo_id', todo_id);
 
-  const span = tracer.startSpan('handleRequest', {
+  const span = tracer.startSpan('process-todo-response', {
     kind: 1,
     attributes: { requestItems: 100 },
   });
+  let normal_latency_ms = Math.random() * (600 - 250) + 250;
+  await sleep(normal_latency_ms);
   span.end();
   return {
     statusCode: 200,
@@ -56,7 +60,7 @@ module.exports.handler = async (event) => {
     },
     body: JSON.stringify(
       {
-        message: `The event type = ${event_type}`,
+        "msg": "hello world! (from Lambda)",
       },
       null,
       2
