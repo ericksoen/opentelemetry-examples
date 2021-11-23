@@ -1,8 +1,8 @@
 module "otlp" {
   source = "../modules/route53"
 
-  domain = var.domain
-  subdomain = "${var.otlp_subdomain}"
+  domain    = var.domain
+  subdomain = var.otlp_subdomain
 
   route53_zone_id = data.aws_route53_zone.zone.id
 
@@ -21,7 +21,7 @@ module "otlp" {
 module "otlp_http" {
   source = "../modules/route53"
 
-  domain = var.domain
+  domain    = var.domain
   subdomain = "${var.otlp_subdomain}-http"
 
   route53_zone_id = data.aws_route53_zone.zone.id
@@ -32,7 +32,7 @@ module "otlp_http" {
 module "jaeger" {
   source = "../modules/route53"
 
-  domain = var.domain
+  domain    = var.domain
   subdomain = var.jaeger_subdomain
 
   route53_zone_id = data.aws_route53_zone.zone.id
@@ -43,7 +43,7 @@ module "jaeger" {
 module "telemetry" {
   source = "../modules/route53"
 
-  domain = var.domain
+  domain    = var.domain
   subdomain = var.telemetry_subdomain
 
   route53_zone_id = data.aws_route53_zone.zone.id

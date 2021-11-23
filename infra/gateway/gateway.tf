@@ -1,5 +1,5 @@
 resource "aws_ecs_cluster" "cluster" {
-  name = "${var.resource_prefix}"
+  name = var.resource_prefix
 
   capacity_providers = ["FARGATE_SPOT"]
 
@@ -11,7 +11,7 @@ resource "aws_ecs_cluster" "cluster" {
 }
 
 resource "aws_ecs_service" "gateway" {
-  name            = "${var.resource_prefix}"
+  name            = var.resource_prefix
   cluster         = aws_ecs_cluster.cluster.id
   task_definition = aws_ecs_task_definition.gateway.arn
   desired_count   = 1
@@ -25,14 +25,14 @@ resource "aws_ecs_service" "gateway" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.otlp.arn
-    container_name   = "${var.resource_prefix}"
+    container_name   = var.resource_prefix
 
     container_port = 4317
   }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.otlp_http.arn
-    container_name   = "${var.resource_prefix}"
+    container_name   = var.resource_prefix
 
     container_port = 4318
   }
@@ -46,14 +46,14 @@ resource "aws_ecs_service" "gateway" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.telemetry.arn
-    container_name   = "${var.resource_prefix}"
+    container_name   = var.resource_prefix
 
     container_port = 55679
   }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.metrics.arn
-    container_name   = "${var.resource_prefix}"
+    container_name   = var.resource_prefix
 
     container_port = 8888
   }
@@ -77,7 +77,7 @@ locals {
   aws_otel_collector_image_version = "v0.13.0"
 }
 resource "aws_ecs_task_definition" "gateway" {
-  family                   = "${var.resource_prefix}"
+  family                   = var.resource_prefix
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.task.arn
   task_role_arn            = aws_iam_role.task.arn
@@ -123,9 +123,9 @@ resource "aws_ecs_task_definition" "gateway" {
           hostPort      = 55679
         },
         {
-          protocol = "tcp"
+          protocol      = "tcp"
           containerPort = 8888
-          hostPort = 8888
+          hostPort      = 8888
         }
       ]
     },
