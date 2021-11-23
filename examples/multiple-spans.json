@@ -1,0 +1,107 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "host.name",
+            "value": {
+              "stringValue": "localhost"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "otlp-http-via-curl"
+            }
+          }
+        ]
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "spans": [
+            {
+              "traceId": "682ccd8fced2a7bd7e8f2d6684a32194",
+              "spanId": "e06dd4f47fde50f5",
+              "parentSpanId": "e06dd4f47fde49cc",
+              "name": "child-span",
+              "kind": 1,
+              "startTimeUnixNano": 1637214954287690700,
+              "endTimeUnixNano": 1637215002652319800,
+              "attributes": [
+                {
+                  "key": "http.scheme",
+                  "value": {
+                    "stringValue": "http"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/curl"
+                  }
+                }
+              ],
+              "droppedAttributesCount": 0,
+              "events": [],
+              "droppedEventsCount": 0,
+              "status": {
+                "code": 1
+              }
+            }
+          ],
+          "instrumentationLibrary": {
+            "name": "local-curl-example"
+          }
+        },
+        {
+          "spans": [
+            {
+              "traceId": "682ccd8fced2a7bd7e8f2d6684a32194",
+              "spanId": "e06dd4f47fde49cc",
+              "name": "root-span",
+              "kind": 1,
+              "startTimeUnixNano": 1637214904287690700,
+              "endTimeUnixNano": 1637215052652319800,
+              "attributes": [
+                {
+                  "key": "http.scheme",
+                  "value": {
+                    "stringValue": "http"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/traces"
+                  }
+                }
+              ],
+              "droppedAttributesCount": 0,
+              "events": [],
+              "droppedEventsCount": 0,
+              "status": {
+                "code": 1
+              }
+            }
+          ],
+          "instrumentationLibrary": {
+            "name": "local-curl-example"
+          }
+        }
+      ]
+    }
+  ]
+}

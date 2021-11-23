@@ -1,6 +1,17 @@
 version: "2"
 services:
-  app:
+  proxy:
+    build:
+      context: .
+    ports:
+      - "5001:5000"
+    depends_on:
+      - downstream
+    environment:
+      - OTLP_HTTP_TARGET=http://gateway:4318
+      - DOWNSTREAM_SERVICE_TARGET=http://downstream:5000/sample
+      - FLASK_APP=proxy
+  downstream:
     build:
       context: .
     ports:
@@ -9,30 +20,34 @@ services:
       - agent
     environment:
       - OTLP_TARGET=http://agent:4317
-  gateway:
-    image: otel/opentelemetry-collector:latest
-    command: ["--config=/etc/otel-config.yaml", "--log-level=ERROR"]
-    ports:
-      - "13134:13134"
-      - "4320:4320"
-      - "55679:55679"
-      - "8888:8888"
-    volumes:
-      - ./otel-gateway-config.yaml:/etc/otel-config.yaml
-    depends_on:
-      - jaeger
+      - FLASK_APP=app
   agent:
     image: otel/opentelemetry-collector:latest
-    command: ["--config=/etc/otel-config.yaml", "--log-level=ERROR"]
+    command: ["--config=/etc/otel-config.yaml", "--log-level=DEBUG"]
     ports:
+      - "4317:4137"
+      - "8888:8888"      
       - "13133:13133"
-      - "4317:4317"
-      - "55680:55679"
-      - "8889:8888"      
+      - "55679:55679"
     volumes:
       - ./otel-agent-config.yaml:/etc/otel-config.yaml
     depends_on: 
       - gateway
+  gateway:
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/otel-config.yaml", "--log-level=DEBUG"]
+    ports:
+      - "4318:4318"
+      # For reasons that are not obvious to me, host:port remappings for
+      # gRPC telemetry only worked when the ports mapped are identical 
+      - "7134:7134"
+      - "8889:8888"
+      - "13134:13133"
+      - "55680:55679"
+    volumes:
+      - ./otel-gateway-config.yaml:/etc/otel-config.yaml
+    depends_on:
+      - jaeger
   jaeger:
     image: jaegertracing/all-in-one
     command: ["--log-level=ERROR"]
