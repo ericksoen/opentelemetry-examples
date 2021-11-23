@@ -13,7 +13,7 @@ module "alb" {
   source = "../modules/route53"
 
   domain    = var.domain
-  subdomain = "${var.otlp_subdomain_prefix}"
+  subdomain = var.otlp_subdomain_prefix
 
   route53_zone_id = data.aws_route53_zone.zone.id
 

@@ -31,7 +31,7 @@ resource "aws_security_group" "ecs" {
   name        = "${var.resource_prefix}-ecs-sg"
   description = "Allows traffic to the otlp service"
 
-  vpc_id = data.aws_vpc.vpc.id  
+  vpc_id = data.aws_vpc.vpc.id
 }
 
 resource "aws_security_group_rule" "otlp_http" {
@@ -41,7 +41,7 @@ resource "aws_security_group_rule" "otlp_http" {
   to_port   = 4318
 
   source_security_group_id = aws_security_group.alb.id
-  security_group_id = aws_security_group.ecs.id
+  security_group_id        = aws_security_group.ecs.id
 }
 
 resource "aws_security_group_rule" "zpage" {
@@ -51,7 +51,7 @@ resource "aws_security_group_rule" "zpage" {
   to_port   = 55679
 
   source_security_group_id = aws_security_group.alb.id
-  security_group_id = aws_security_group.ecs.id
+  security_group_id        = aws_security_group.ecs.id
 }
 
 resource "aws_security_group_rule" "metrics" {
@@ -61,7 +61,7 @@ resource "aws_security_group_rule" "metrics" {
   to_port   = 8888
 
   source_security_group_id = aws_security_group.alb.id
-  security_group_id = aws_security_group.ecs.id
+  security_group_id        = aws_security_group.ecs.id
 }
 
 # We can restrict access to this SG to traffic that originates
@@ -73,7 +73,7 @@ resource "aws_security_group_rule" "health_check" {
   from_port = 13133
   to_port   = 13133
 
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.ecs.id
 }
 
@@ -83,7 +83,7 @@ resource "aws_security_group_rule" "otlp" {
   from_port = 4317
   to_port   = 4317
 
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.ecs.id
 }
 

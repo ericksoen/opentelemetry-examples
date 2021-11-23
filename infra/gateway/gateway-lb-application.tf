@@ -12,12 +12,12 @@ resource "aws_lb_listener" "default" {
   protocol          = "HTTPS"
   certificate_arn   = module.alb.certificate_arn
   default_action {
-    type             = "fixed-response"
+    type = "fixed-response"
 
     fixed_response {
       content_type = "application/json"
       message_body = "{\"message\": \"hello-world\"}"
-      status_code = "200"
+      status_code  = "200"
     }
   }
 }
