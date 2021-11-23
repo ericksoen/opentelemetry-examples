@@ -20,7 +20,7 @@ Enterprise vendors who support OpenTelemetry Protocol (OTLP) include AWS, Datado
 
 Over time, the OpenTelemetry protocol will provide support for telemetry data like _traces_, _metrics_, and _logs_. Currently, only tracing has been released as a generally available, production quality release. Check back on the [OpenTelemetry component status](https://opentelemetry.io/status/) for updates on the development lifecycle for other telemetry data, e.g., metrics and logs.
 
-## Getting Started and Examples
+## Dependencies
 
 These examples assumes you have at least the following tools/services installed and are somewhat fluent in their use:
 
@@ -28,6 +28,10 @@ These examples assumes you have at least the following tools/services installed 
 1. [Docker](https://www.docker.com/)
 1. [Python (v3.8.x)](https://www.python.org/downloads/)
 1. [AWS CLI](https://aws.amazon.com/cli/)
+
+You may optionally use [K6](https://k6.io/) to generate load for your services once they exist. See [load test](./load-test/README.md) documentation for additional details. 
+
+## Getting Started
 
 The [examples](./examples/README.md) folder has some code samples to help familiarize yourself with some core OpenTelemetry concepts on your local machine before developing, deploying, and instrumenting more complex applications in AWS.
 
@@ -97,8 +101,6 @@ The caveats noted below attempt to describe some of the technical issues that li
 
 1. [Add custom attributes to Lambda via tracer](https://github.com/open-telemetry/opentelemetry-lambda/issues/122)
 1. [Add attributes to Lambda span via processor](https://github.com/open-telemetry/opentelemetry-lambda/issues/121)
-1. Distributed tracing for the Lambda function, regardless of how it is invoked, incorrectly generates a reference to a non-existent parent span.
-   +  This breaks the trace directed acyclic graph (DAG) for every Lambda invocation and generates orphaned spans
 
 ## Resources
 
