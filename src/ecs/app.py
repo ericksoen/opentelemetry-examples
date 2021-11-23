@@ -3,6 +3,7 @@ import requests
 import random
 import os
 import time
+import json
 
 from opentelemetry import trace
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
@@ -18,8 +19,8 @@ trace.set_tracer_provider(
     )
 )
 
-MIN_LATENCY_MS = 2500
-MAX_LATENCY_MS = 5000
+MIN_LATENCY_MS = 500
+MAX_LATENCY_MS = 1100
 otlp_target = os.getenv('OTLP_TARGET', "http://127.0.0.1:4317")
 http_request_target = os.getenv('HTTP_REQUEST_TARGET')
 print(f"The OLTP target = {otlp_target}")
@@ -54,6 +55,8 @@ def hello():
     if is_server_error_fault:
         return jsonify({"message": "internal server error"}), 502
 
+    normal_latency_ms = random.randint(250, 400)
     with tracer.start_as_current_span("invoke-ec2"):
-        requests.get(http_request_target)
-    return {"otlp_target": otlp_target}
+        time.sleep(normal_latency_ms / 1000)
+        resp = requests.get(http_request_target)
+    return {"otlp_target": otlp_target, "ec2_response": resp.json()}

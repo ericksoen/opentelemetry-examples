@@ -117,7 +117,7 @@ def handler(event, context):
 
         start_time = time.time_ns()
 
-        is_auth_fault = random.randint(1, 100) > 70
+        is_auth_fault = random.randint(1, 100) > 95
 
         if (is_auth_fault):
             message_response.update(AUTH_ERROR_MESSAGE)
@@ -142,7 +142,7 @@ def handler(event, context):
 
         downstream_faults = ""
         for _ in range(2):
-            is_fault = int(random.randint(1, 100) > 70)
+            is_fault = int(random.randint(1, 100) > 90)
             downstream_faults += f"{is_fault}"
 
         # Generate a w3c traceparent header and inject into downstream
@@ -155,10 +155,11 @@ def handler(event, context):
 
         resp = requests.get(f"{TARGET_BASE_URL}/{target}", headers = headers)
 
-        client_body = resp.json()
-        client_body["trace_id"] = trace_id
-        client_body["span_id"] = span_id
-        message_response.update({"statusCode": resp.status_code, "body": json.dumps(client_body)})
+        proxy_details = {
+            "trace_id": trace_id,
+            "span_id": span_id,
+        }
+        message_response.update({"statusCode": resp.status_code, "body": json.dumps({"proxyDetails": proxy_details, "clientResponse": resp.json()})})
 
     except BadRequestError as e:
         print(e)
@@ -167,8 +168,6 @@ def handler(event, context):
     finally:
         end_time = time.time_ns()
         otlp_http_body = span_factory(trace_id, span_id, start_time, end_time, message_response["statusCode"], path, method)
-        print(f"The span body = {otlp_http_body}")
-        print(f"The message body = {json.dumps(message_response)}")
         trace_resp = requests.post(f"{HTTP_TRACE_GATEWAY_URL}/v1/traces", data = otlp_http_body, headers = {
         "Content-Type": "application/json"
         })
