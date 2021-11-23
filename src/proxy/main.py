@@ -32,12 +32,20 @@ def span_factory(trace_id, span_id, start_time_unix_nano, end_time_unix_nano, st
     "resourceSpans": [
         {
             "resource": {
-                "attributes": [{
+                "attributes": [
+                {
                     "key": "environment",
                     "value": {
                         "stringValue": "localhost"
                     }
-                }]
+                },
+                {
+                    "key": "service.name",
+                    "value": {
+                        "stringValue": service_name
+                    }
+                }
+                ]
             },
             "instrumentationLibrarySpans": [{
                 "spans": [
@@ -70,13 +78,7 @@ def span_factory(trace_id, span_id, start_time_unix_nano, end_time_unix_nano, st
                             {
                                 "key": "name",
                                 "value": {
-                                    "stringValue": name 
-                                }
-                            }
-                            {
-                                "key": "service.name",
-                                "value": {
-                                    "stringValue": service_name,
+                                    "stringValue": name,
                                 }
                             }
                         ],
