@@ -1,3 +1,3 @@
 output "app_hostname" {
-    value = module.app.record_name
+  value = module.app.record_name
 }

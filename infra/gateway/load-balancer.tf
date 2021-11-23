@@ -25,9 +25,9 @@ resource "aws_lb_target_group" "otlp" {
   target_type = "ip"
 
   health_check {
-    port = 13133
-    healthy_threshold = 2
+    port                = 13133
+    healthy_threshold   = 2
     unhealthy_threshold = 2
-    interval = 10    
+    interval            = 10
   }
 }

@@ -25,34 +25,34 @@ variable "default_tags" {
 
 variable "honeycomb_base_config" {
   type = object({
-    write_key = string
+    write_key    = string
     dataset_name = string
   })
 
   default = {
     dataset_name = ""
-    write_key = ""
+    write_key    = ""
   }
 
   validation {
-    condition = (var.honeycomb_base_config.dataset_name != "" ? var.honeycomb_base_config.write_key != "" : true)
+    condition     = (var.honeycomb_base_config.dataset_name != "" ? var.honeycomb_base_config.write_key != "" : true)
     error_message = "A write key must be provided with a dataset name."
   }
 }
 
 variable "honeycomb_refinery_config" {
   type = object({
-    write_key = string
+    write_key    = string
     dataset_name = string
   })
 
   default = {
     dataset_name = ""
-    write_key = ""
+    write_key    = ""
   }
 
   validation {
-    condition = (var.honeycomb_refinery_config.dataset_name != "" ? var.honeycomb_refinery_config.write_key != "" : true)
+    condition     = (var.honeycomb_refinery_config.dataset_name != "" ? var.honeycomb_refinery_config.write_key != "" : true)
     error_message = "A write key must be provided with a dataset name."
   }
 }
@@ -105,5 +105,5 @@ variable "jaeger_subdomain" {
 
 variable "telemetry_subdomain" {
   description = "The subdomain to review OpenCollector agent telemetry"
-  default = "telemetry"
+  default     = "telemetry"
 }
