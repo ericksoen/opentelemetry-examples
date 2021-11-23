@@ -24,6 +24,11 @@ jobs:
     - name: Check Terraform formatting
       run: terraform fmt -check
       working-directory:
+        ./infra/applications
+        
+    - name: Check Terraform formatting
+      run: terraform fmt -check
+      working-directory:
         ./infra/gateway
 
     - uses: actions/github-script@0.9.0
