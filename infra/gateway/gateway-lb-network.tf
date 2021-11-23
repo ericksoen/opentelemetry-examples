@@ -2,14 +2,14 @@ resource "aws_lb" "nlb" {
   name               = "${var.resource_prefix}-nlb"
   internal           = true
   load_balancer_type = "network"
-  subnets            = data.aws_subnet_ids.subnets.ids
+  subnets            = data.aws_subnet_ids.public.ids
 }
 
 resource "aws_lb_listener" "otlp" {
   load_balancer_arn = aws_lb.nlb.id
   port              = "443"
   protocol          = "TLS"
-  certificate_arn   = module.otlp.certificate_arn
+  certificate_arn   = module.nlb.certificate_arn
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.otlp.arn

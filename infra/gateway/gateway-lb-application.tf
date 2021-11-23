@@ -1,24 +1,29 @@
-resource "aws_lb" "jaeger" {
-  name               = "${var.resource_prefix}-jaeger-alb"
+resource "aws_lb" "alb" {
+  name               = "${var.resource_prefix}-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.jaeger.id]
-  subnets            = data.aws_subnet_ids.subnets.ids
+  security_groups    = [aws_security_group.alb.id]
+  subnets            = data.aws_subnet_ids.public.ids
 }
 
-resource "aws_lb_listener" "jaeger" {
-  load_balancer_arn = aws_lb.jaeger.id
+resource "aws_lb_listener" "default" {
+  load_balancer_arn = aws_lb.alb.id
   port              = "443"
   protocol          = "HTTPS"
-  certificate_arn   = module.jaeger.certificate_arn
+  certificate_arn   = module.alb.certificate_arn
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.jaeger_ui.arn
+    type             = "fixed-response"
+
+    fixed_response {
+      content_type = "application/json"
+      message_body = "{\"message\": \"hello-world\"}"
+      status_code = "200"
+    }
   }
 }
 
 resource "aws_lb_listener_rule" "debug" {
-  listener_arn = aws_lb_listener.jaeger.arn
+  listener_arn = aws_lb_listener.default.arn
   priority     = 4
   action {
     type             = "forward"
@@ -33,7 +38,7 @@ resource "aws_lb_listener_rule" "debug" {
 }
 
 resource "aws_lb_listener_rule" "metrics" {
-  listener_arn = aws_lb_listener.jaeger.arn
+  listener_arn = aws_lb_listener.default.arn
   priority     = 5
   action {
     type             = "forward"
@@ -48,7 +53,7 @@ resource "aws_lb_listener_rule" "metrics" {
 }
 
 resource "aws_lb_listener_rule" "otlp_http" {
-  listener_arn = aws_lb_listener.jaeger.arn
+  listener_arn = aws_lb_listener.default.arn
   priority     = 6
 
   action {
@@ -62,14 +67,11 @@ resource "aws_lb_listener_rule" "otlp_http" {
     }
   }
 }
-resource "aws_lb_listener_certificate" "telemetry" {
-  listener_arn    = aws_lb_listener.jaeger.arn
-  certificate_arn = module.telemetry.certificate_arn
-}
+
 
 resource "aws_lb_listener_certificate" "otlp_http" {
-  listener_arn    = aws_lb_listener.jaeger.arn
-  certificate_arn = module.otlp_http.certificate_arn
+  listener_arn    = aws_lb_listener.default.arn
+  certificate_arn = module.alb.certificate_arn
 }
 
 resource "aws_lb_target_group" "telemetry" {
@@ -120,40 +122,4 @@ resource "aws_lb_target_group" "metrics" {
     interval            = 10
 
   }
-}
-
-resource "aws_lb_target_group" "jaeger_ui" {
-  name        = "${var.resource_prefix}-jaeger-ui-tg"
-  port        = 16686
-  protocol    = "HTTP"
-  target_type = "ip"
-  vpc_id      = data.aws_vpc.vpc.id
-}
-
-resource "aws_security_group" "jaeger" {
-  name        = "${var.resource_prefix}-jaeger-sg"
-  description = "Allow inbound traffic to the load balancer"
-
-  vpc_id = data.aws_vpc.vpc.id
-}
-
-resource "aws_security_group_rule" "https" {
-  type      = "ingress"
-  protocol  = "tcp"
-  from_port = 443
-  to_port   = 443
-
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.jaeger.id
-}
-
-resource "aws_security_group_rule" "alb_egress" {
-  type     = "egress"
-  protocol = "all"
-
-  from_port = 0
-  to_port   = 0
-
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.jaeger.id
 }

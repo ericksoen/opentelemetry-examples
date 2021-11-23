@@ -18,9 +18,9 @@ resource "aws_ecs_service" "gateway" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = data.aws_subnet_ids.private.ids
-    security_groups  = [aws_security_group.allow_otlp.id]
-    assign_public_ip = false
+    subnets          = data.aws_subnet_ids.public.ids
+    security_groups  = [aws_security_group.ecs.id]
+    assign_public_ip = true
   }
 
   load_balancer {
@@ -35,13 +35,6 @@ resource "aws_ecs_service" "gateway" {
     container_name   = var.resource_prefix
 
     container_port = 4318
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.jaeger_ui.arn
-    container_name   = "${var.resource_prefix}-jaeger"
-
-    container_port = 16686
   }
 
   load_balancer {
@@ -61,7 +54,6 @@ resource "aws_ecs_service" "gateway" {
   depends_on = [
     aws_iam_role.task,
     aws_lb_target_group.otlp,
-    aws_lb_target_group.jaeger_ui,
     aws_lb_target_group.telemetry,
     aws_lb_target_group.metrics,
     aws_lb_target_group.otlp_http
@@ -75,6 +67,7 @@ locals {
   # Pin to the last known working version until the issue is resolved
   # See: https://github.com/aws-observability/aws-otel-collector/issues/748
   aws_otel_collector_image_version = "v0.13.0"
+
 }
 resource "aws_ecs_task_definition" "gateway" {
   family                   = var.resource_prefix
@@ -129,37 +122,6 @@ resource "aws_ecs_task_definition" "gateway" {
         }
       ]
     },
-    {
-      name      = "${var.resource_prefix}-jaeger"
-      image     = "jaegertracing/all-in-one:latest"
-      essential = true
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-create-group  = "true"
-          awslogs-region        = "${local.region_name}"
-          awslogs-group         = "/${var.resource_prefix}"
-          awslogs-stream-prefix = "jaeger"
-        }
-      }
-      portMappings = [
-        {
-          protocol      = "http"
-          containerPort = 16686
-          hostPort      = 16686
-        },
-        {
-          protocol      = "tcp"
-          containerPort = 14268
-          hostPort      = 14268
-        },
-        {
-          protocol      = "tcp"
-          containerPort = 14250
-          hostPort      = 14250
-        }
-      ]
-    }
   ])
 
   # lifecycle {

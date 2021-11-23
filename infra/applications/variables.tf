@@ -35,10 +35,9 @@ variable "app_subdomain" {
   default     = "demo"
 }
 
-variable "otlp_hostname" {
-  description = "The URL for OTLP traffic"
+variable "otlp_grpc_hostname" {
+  description = "The URL for receiving OTLP traces via gRPC"
 }
-
-variable "jaeger_ui_hostname" {
-  description = "The URL to load the Jaeger (tracing) application UI"
+variable "otlp_http_hostname" {
+  description = "The URL for receiving OTLP traces via http"
 }
