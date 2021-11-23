@@ -1,24 +1,30 @@
 name: terraform actions
-on: push
-# defaults:
-  # env:
-  #   tf_actions_working_dir: infra/applications
-  # run:
-  #   working-directory: ${{ env.tf_actions_working_dir }}
+on:
+  pull_request:
+
+    # defaults:
+    #   run:
+    #     working-directory: ./infra/gateway
 jobs:
-  format-terraform:
+  terraform:
+    name: 'Terraform'
     runs-on: ubuntu-latest
+
     defaults:
       run:
-        working-directory: ./infra/gateway
+        shell: bash
+        
     steps:
-    - uses: actions/checkout@v2
-    - uses: hashicorp/setup-terraform@v1
+    - name: Checkout
+      uses: actions/checkout@v2
 
-    - name: Terraform fmt
-      id: fmt
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Check Terraform formatting
       run: terraform fmt -check
-      continue-on-error: false
+      working-directory:
+        ./infra/gateway
 
     - uses: actions/github-script@0.9.0
       if: github.event_name == 'pull_request'
