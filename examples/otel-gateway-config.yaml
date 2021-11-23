@@ -2,12 +2,14 @@ extensions:
   zpages:
     endpoint: 0.0.0.0:55679
   health_check:
-    endpoint: 0.0.0.0:13134
 receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: 0.0.0.0:4320
+        # Listen on a custom port for gRPC data since we 
+        # have a port conflict on the default port due
+        # to running two collectors on the same network          
+        endpoint: 0.0.0.0:7134
       http:
 processors:
   attributes:
@@ -22,7 +24,6 @@ exporters:
     insecure: true
   logging:
     logLevel: debug
-
 service:
   extensions: [health_check, zpages]
   pipelines:

@@ -6,7 +6,6 @@ receivers:
   otlp:
     protocols:
       grpc:
-      http:
 processors:
   attributes:
     actions:
@@ -16,7 +15,10 @@ processors:
   batch:
 exporters:
   otlp:
-    endpoint: gateway:4320
+    # Send gRPC data to the gateway on a custom port
+    # since we have a port conflict for gRPC data due
+    # to running two collectors on the same network    
+    endpoint: gateway:7134
     insecure: true
   logging:
     logLevel: debug

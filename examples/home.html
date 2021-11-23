@@ -1,24 +1,38 @@
 <div>
-    The resource list below are all locally hosted and intend to help you visualize traces and monitor your OpenTelemetry collectors:    
+    The resource list below are all locally hosted and intend to help you explore, visualize, and monitor your OpenTelemetry collectors:    
     <ul>
-        <li style="margin-left: 20x">
-            <a target="_blank" href="http://127.0.0.1:16686">Jaeger Site</a>
+      <li>
+          <a target="_blank" href="http://127.0.0.1:16686">Jaeger Site to visualize traces</a>
+      </li>
+        <li>
+            <a target="_blank" href="http://127.0.0.1:5001/proxy">Proxies requests to a downstream service</a>
+        </li>
+        <li>
+            <a target="_blank" href="http://127.0.0.1:5000/sample">Downstream service that receives proxied or direct requests  </a>
+        </li>
+        <li>
+          <a target="_blank" href="http://127.0.0.1:13133"
+            >OpenTelemetry Collector Agent Health</a>
         </li>
         <li>
           <a target="_blank" href="http://127.0.0.1:55679/debug/tracez"
-            >OpenTelemetry Collector Gateway Debug Tool</a>
-        </li>
-        <li>
-          <a target="_blank" href="http://127.0.0.1:55680/debug/tracez"
             >OpenTelemetry Collector Agent Debug Tool</a>
         </li>
         <li>
           <a target="_blank" href="http://127.0.0.1:8888/metrics"
-            >OpenTelemetry Collector Gateway Metrics (Prometheus)</a>
+            >OpenTelemetry Collector Agent Metrics (Prometheus)</a>
+        </li>        
+        <li>
+          <a target="_blank" href="http://127.0.0.1:13134"
+            >OpenTelemetry Collector Gateway Health</a>
+        </li>
+        <li>
+          <a target="_blank" href="http://127.0.0.1:55680/debug/tracez"
+            >OpenTelemetry Collector Gateway Debug Tool</a>
         </li>
         <li>
           <a target="_blank" href="http://127.0.0.1:8889/metrics"
-            >OpenTelemetry Collector Agent Metrics (Prometheus)</a>
+            >OpenTelemetry Collector Gateway Metrics (Prometheus)</a>
         </li>
-      </ul>
+       </ul>
 </div>

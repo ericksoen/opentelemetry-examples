@@ -1,6 +1,7 @@
-from flask import Flask, send_from_directory
+from flask import Flask
 import requests
 import os
+import random
 
 from opentelemetry import trace
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
@@ -33,20 +34,16 @@ app = Flask(__name__)
 FlaskInstrumentor().instrument_app(app)
 RequestsInstrumentor().instrument()
 
-@app.route('/')
-def home():
-    return send_from_directory('', 'home.html')
-    
-@app.route('/status')
-def ping():
-    return {"Success": True}
-
+   
 @app.route("/sample")
 def hello():
-    tracer = trace.get_tracer(__name__)
-    with tracer.start_as_current_span("example-request"):
+    
+    with tracer.start_as_current_span("example-request") as f:
+        context = f.get_span_context()
+        sleepDuration = random.randint(400, 900)
+        time.sleep(sleepDuration / 1000)
         requests.get("http://www.example.com")
-    return "hello"
+    return {"message": "hello", "traceId": hex(context.trace_id)[2:]}
 
 
 app.run(debug=True, port=5000)
