@@ -10,6 +10,8 @@ receivers:
 exporters:
   logging:
     logLevel: debug
+  awsxray:
+    region: ${AWS_REGION} 
   otlp/hc:
     endpoint: "api.honeycomb.io:443"
     headers:

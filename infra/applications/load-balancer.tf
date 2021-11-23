@@ -3,7 +3,7 @@ resource "aws_lb" "alb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = data.aws_subnet_ids.subnets.ids
+  subnets            = data.aws_subnet_ids.public.ids
 }
 
 resource "aws_lb_listener" "https" {
@@ -29,7 +29,6 @@ data "template_file" "homepage" {
   template = file("${path.module}/homepage.template")
 
   vars = {
-    jaeger_hostname        = var.jaeger_ui_hostname
     demo_hostname          = module.app.record_name
     root_service_path      = local.primary_rest_resource
     secondary_service_path = local.secondary_rest_resource

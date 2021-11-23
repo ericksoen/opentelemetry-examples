@@ -10,7 +10,7 @@ data "aws_vpc" "vpc" {
   }
 }
 
-data "aws_subnet_ids" "subnets" {
+data "aws_subnet_ids" "public" {
   vpc_id = data.aws_vpc.vpc.id
 
   dynamic "filter" {

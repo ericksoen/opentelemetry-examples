@@ -8,6 +8,7 @@ resource "aws_ssm_parameter" "gateway_config" {
     HONEYCOMB_BASE_DATASET     = local.honeycomb_base_dataset_name
     HONEYCOMB_REFINERY_DATASET = local.honeycomb_refinery_dataset_name
     HONEYCOMB_REFINERY_URL     = local.honeycomb_refinery_url
+    AWS_REGION                 = data.aws_region.current.name
     EXPORTER_KEYS              = join(", ", [for exporter in local.exporters_map : exporter.key if exporter.enabled])
   })
 }
@@ -23,16 +24,16 @@ locals {
       "enabled" : true,
     },
     {
+      "key" : "awsxray",
+      "enabled" : true
+    },
+    {
       "key" : "otlp/hc",
       "enabled" : local.honeycomb_enable_base
     },
     {
       "key" : "otlphttp",
       "enabled" : local.honeycomb_enable_refinery
-    },
-    {
-      "key" : "jaeger",
-      "enabled" : local.jaeger_enable,
     },
     {
       "key" : "otlp/lightstep",

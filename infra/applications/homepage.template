@@ -1,8 +1,5 @@
 <ul>
   <li>
-    <a target="_blank" href="https://${jaeger_hostname}">Jaeger Site</a>
-  </li>
-  <li>
     <a target="_blank" href="https://${demo_hostname}/proxy?target=${root_service_path}"
       >Root Service URL (ECS)</a
     >

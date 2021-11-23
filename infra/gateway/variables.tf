@@ -80,30 +80,7 @@ variable "domain" {
   description = "The name of the domain to associate with resources"
 }
 
-# Jaeger exporter is currently supported in upstream OpenTelemetry collector image
-# but is not available in AWS Distro/OpenTelemetry (ADOT) image.
-# Do not enable jaeger exporter until it is avaiable. 
-# See: https://github.com/aws-observability/aws-otel-collector/issues/292
-variable "enable_jaeger" {
-  default = false
-}
-
-variable "otlp_subdomain" {
-  description = "The subdomain for OTLP traffic"
+variable "otlp_subdomain_prefix" {
+  description = "The subdomain prefix for OTLP traffic"
   default     = "otlp"
-}
-
-variable "app_subdomain" {
-  description = "The subdomain for application traffic"
-  default     = "demo"
-}
-
-variable "jaeger_subdomain" {
-  description = "The subdomain for the jaeger UI"
-  default     = "jaeger"
-}
-
-variable "telemetry_subdomain" {
-  description = "The subdomain to review OpenCollector agent telemetry"
-  default     = "telemetry"
 }

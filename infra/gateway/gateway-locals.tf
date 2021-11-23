@@ -15,14 +15,6 @@ locals {
   honeycomb_refinery_url = local.honeycomb_enable_refinery ? module.refinery[0].refinery_url : ""
 }
 
-# Jaeger extension is currently supported in upstream OpenTelemetry collector image
-# but is not available in AWS Distro/OpenTelemetry (ADOT) image.
-# See: https://github.com/aws-observability/aws-otel-collector/issues/292
-locals {
-  jaeger_enable = var.enable_jaeger
-
-}
-
 locals {
   lightstep_enable = var.lightstep_config.access_token != ""
 
