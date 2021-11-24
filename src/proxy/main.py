@@ -27,7 +27,7 @@ class BadRequestError(Exception):
     pass
 
 # Note: the `service.name` property appears to be required when exporting to Lightstep or spans will be rejected
-def span_factory(trace_id, span_id, start_time_unix_nano, end_time_unix_nano, status_code, path, http_method, name = "proxy", service_name="proxy-service"):
+def span_factory(trace_id, span_id, start_time_unix_nano, end_time_unix_nano, status_code, path, http_method, name = "proxy", service_name="proxy-service", proxy_target = ""):
     body =  {
     "resourceSpans": [
         {
@@ -79,6 +79,12 @@ def span_factory(trace_id, span_id, start_time_unix_nano, end_time_unix_nano, st
                                 "key": "name",
                                 "value": {
                                     "stringValue": name,
+                                }
+                            },
+                            {
+                                "key": "proxy.target",
+                                "value": {
+                                    "stringValue": proxy_target,
                                 }
                             }
                         ],
@@ -167,7 +173,7 @@ def handler(event, context):
         print(e)
     finally:
         end_time = time.time_ns()
-        otlp_http_body = span_factory(trace_id, span_id, start_time, end_time, message_response["statusCode"], path, method)
+        otlp_http_body = span_factory(trace_id, span_id, start_time, end_time, message_response["statusCode"], path, method, proxy_target=target)
         trace_resp = requests.post(f"{HTTP_TRACE_GATEWAY_URL}/v1/traces", data = otlp_http_body, headers = {
         "Content-Type": "application/json"
         })
