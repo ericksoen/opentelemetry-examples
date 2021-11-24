@@ -59,4 +59,4 @@ def hello():
     with tracer.start_as_current_span("invoke-ec2"):
         time.sleep(normal_latency_ms / 1000)
         resp = requests.get(http_request_target)
-    return {"otlp_target": otlp_target, "ec2_response": resp.json()}
+    return {"otlp_target": otlp_target, "ec2_response": resp.json()}, resp.status_code

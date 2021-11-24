@@ -79,4 +79,4 @@ def hello():
         time.sleep(normal_latency_ms / 1000)
         
         resp = requests.get(lambda_target)
-        return {"otlp_target": otlp_target, "lambda_response": resp.json()}
+        return {"otlp_target": otlp_target, "lambda_response": resp.json()}, resp.status_code
