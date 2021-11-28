@@ -1,5 +1,5 @@
 ---
-name: tfsec-sarif
+name: Terraform security scan
 
 on:
   pull_request:
