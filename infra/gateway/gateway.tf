@@ -131,6 +131,15 @@ resource "aws_ecs_task_definition" "gateway" {
 
 resource "aws_s3_bucket" "b" {
   bucket_prefix = "${var.resource_prefix}-"
+
+  versioning {
+    enabled = true
+  }
+
+  logging {
+    target_bucket = "bucket-logging-demo"
+    target_prefix = "logs/"
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "example" {
