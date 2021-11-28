@@ -11,9 +11,6 @@ resource "local_file" "rules_file" {
   })
 }
 
-# For now, we'll put this in a separate and public VPC. Eventually,
-# we'll deploy this to the same VPC as the rest of the infrastructure
-# in this demo.
 module "refinery" {
 
   count             = local.honeycomb_refinery_count
@@ -23,10 +20,15 @@ module "refinery" {
   refinery_rules_file_path = "${path.module}/${local_file.rules_file[count.index].filename}"
 
   vpc_id = data.aws_vpc.vpc.id
-  vpc_alb_subnets = data.aws_subnet_ids.private.ids
-  redis_subnets = data.aws_subnet_ids.private.ids
-  ecs_service_subnets = data.aws_subnet_ids.private.ids
-  alb_internal = var.assign_public_ip
+
+  # TODO: Ultimately, we should use a conditional to determine the
+  # whether to use the public or private network topology. For now,
+  # we'll use whatever subnets are returned by the private subnet
+  # data providers.
+  vpc_alb_subnets              = data.aws_subnet_ids.private.ids
+  redis_subnets                = data.aws_subnet_ids.private.ids
+  ecs_service_subnets          = data.aws_subnet_ids.private.ids
+  alb_internal                 = var.assign_public_ip
   ecs_service_assign_public_ip = var.assign_public_ip
 
   depends_on = [
