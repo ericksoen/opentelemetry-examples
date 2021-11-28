@@ -132,3 +132,10 @@ resource "aws_ecs_task_definition" "gateway" {
 resource "aws_s3_bucket" "b" {
   bucket_prefix = "${var.resource_prefix}-"
 }
+
+resource "aws_s3_bucket_public_access_block" "example" {
+  bucket = aws_s3_bucket.b.id
+
+  block_public_acls   = true
+  block_public_policy = true
+}
