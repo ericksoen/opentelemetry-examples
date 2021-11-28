@@ -84,3 +84,9 @@ variable "otlp_subdomain_prefix" {
   description = "The subdomain prefix for OTLP traffic"
   default     = "otlp"
 }
+
+variable "assign_public_ip" {
+  description = "Boolean flag to determine if service should be assigned a public IP"
+  type        = bool
+  default     = false
+}
