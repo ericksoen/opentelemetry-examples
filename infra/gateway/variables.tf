@@ -86,7 +86,7 @@ variable "otlp_subdomain_prefix" {
 }
 
 variable "assign_public_ip" {
-    description = "Boolean flag to determine if service should be assigned a public IP"
-    type = bool
-    default = false
+  description = "Boolean flag to determine if service should be assigned a public IP"
+  type        = bool
+  default     = false
 }
