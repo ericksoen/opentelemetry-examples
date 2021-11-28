@@ -3,7 +3,7 @@ resource "aws_lb" "alb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = local.lb_subnet_ids
+  subnets            = data.aws_subnet_ids.lb.ids
 }
 
 resource "aws_lb_listener" "https" {

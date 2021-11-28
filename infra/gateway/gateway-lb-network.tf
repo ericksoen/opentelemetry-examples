@@ -2,7 +2,7 @@ resource "aws_lb" "nlb" {
   name               = "${var.resource_prefix}-nlb"
   internal           = true
   load_balancer_type = "network"
-  subnets            = local.lb_subnet_ids
+  subnets            = data.aws_subnet_ids.lb.ids
 }
 
 resource "aws_lb_listener" "otlp" {

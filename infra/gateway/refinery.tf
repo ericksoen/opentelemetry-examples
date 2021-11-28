@@ -21,9 +21,9 @@ module "refinery" {
 
   vpc_id = data.aws_vpc.vpc.id
 
-  vpc_alb_subnets              = local.service_subnet_ids
-  redis_subnets                = local.service_subnet_ids
-  ecs_service_subnets          = local.service_subnet_ids
+  vpc_alb_subnets              = data.aws_subnet_ids.service.ids
+  redis_subnets                = data.aws_subnet_ids.service.ids
+  ecs_service_subnets          = data.aws_subnet_ids.service.ids
   ecs_service_assign_public_ip = local.use_public_service_ips
 
   depends_on = [

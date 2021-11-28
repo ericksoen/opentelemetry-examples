@@ -15,7 +15,7 @@ module "ecs" {
   server_request_resource = local.secondary_rest_resource
   health_check_path       = "/status"
 
-  subnet_ids      = local.service_subnet_ids
+  subnet_ids      = data.aws_subnet_ids.service.ids
   vpc_id          = data.aws_vpc.vpc.id
   assign_public_ip = local.use_public_service_ips
   resource_prefix = var.resource_prefix
@@ -36,7 +36,7 @@ module "ec2" {
   health_check_path       = "/status"
 
   assign_public_ip = local.use_public_service_ips
-  subnet_ids      = local.service_subnet_ids
+  subnet_ids      = data.aws_subnet_ids.service.ids
   vpc_id          = data.aws_vpc.vpc.id
   
   resource_prefix = var.resource_prefix
@@ -51,7 +51,7 @@ module "lambda" {
   region_name     = local.region_name
 
   otlp_hostname            = var.otlp_grpc_hostname
-  subnet_ids               = local.service_subnet_ids
+  subnet_ids               = data.aws_subnet_ids.service.ids
   source_security_group_id = aws_security_group.alb_sg.id
 
   vpc_id = data.aws_vpc.vpc.id
@@ -63,7 +63,7 @@ module "proxy" {
   resource_prefix             = var.resource_prefix
   target_base_url             = "https://${module.app.record_name}"
   http_trace_gateway_base_url = "https://${var.otlp_http_hostname}"
-  subnet_ids                  = local.service_subnet_ids
+  subnet_ids                  = data.aws_subnet_ids.service.ids
   source_security_group_id    = aws_security_group.alb_sg.id
 
   vpc_id = data.aws_vpc.vpc.id
