@@ -20,7 +20,7 @@ resource "aws_ecs_service" "gateway" {
   network_configuration {
     subnets          = data.aws_subnet_ids.private.ids
     security_groups  = [aws_security_group.ecs.id]
-    assign_public_ip = false
+    assign_public_ip = var.assign_public_ip
   }
 
   load_balancer {

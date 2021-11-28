@@ -22,10 +22,12 @@ module "refinery" {
 
   refinery_rules_file_path = "${path.module}/${local_file.rules_file[count.index].filename}"
 
-  # Optional: customize the VPC
-  azs                = ["us-east-2a", "us-east-2b", "us-east-2c"]
-  vpc_cidr           = "10.20.0.0/16"
-  vpc_public_subnets = ["10.20.1.0/24", "10.20.2.0/24", "10.20.3.0/24"]
+  vpc_id = data.aws_vpc.vpc.id
+  vpc_alb_subnets = data.aws_subnet_ids.private.ids
+  redis_subnets = data.aws_subnet_ids.private.ids
+  ecs_service_subnets = data.aws_subnet_ids.private.ids
+  alb_internal = var.assign_public_ip
+  ecs_service_assign_public_ip = var.assign_public_ip
 
   depends_on = [
     local_file.rules_file
