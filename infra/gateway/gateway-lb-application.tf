@@ -1,3 +1,4 @@
+#tfsec:ignore:aws-elbv2-alb-not-public:exp:2022-01-31
 resource "aws_lb" "alb" {
   name               = "${var.resource_prefix}-alb"
   internal           = false
