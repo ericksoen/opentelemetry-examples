@@ -4,16 +4,16 @@ This infrastructure creates the OpenTelemetry Gateway collector as an ECS task r
 
 ## Variables
 
-|Name|Default Value|
+|Name|Required|
 |-|-|
-|resource_prefix|otel-gateway|
-|vpc_filters||
-|subnet_filters||
-|private_subnet_filters||
-|default_tags||
-|honeycomb_write_key||
-|honeycomb_refinery_dataset||
-|honeycomb_dataset||
+|resource_prefix|No|
+|vpc_filters|Yes|
+|subnet_configuration|Yes|
+|default_tags|Yes|
+|honeycomb_base_config|No|
+|honeycomb_refinery_config|No|
+|lightstep_config|No|
+|newrelic_config|No|
 
 ```bash
 pushd infra/gateway
@@ -21,7 +21,6 @@ $ terraform apply -var-file="example-variables.tfvars" -var-file="../shared-exam
 
 Outputs:
 
-jaeger_hostname = "jaeger.domain.com"
-otlp_hostname = "otlp.domain.com"
-telemetry_hostname = "telemetry.domain.com"
+otlp_grpc_hostname = "otlp.grpc.domain.com"
+otlp_https_hostname = "otlp.domain.com"
 ```

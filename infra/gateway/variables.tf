@@ -3,18 +3,29 @@ variable "resource_prefix" {
   default     = "otel-gateway"
 }
 
+variable subnet_configuration {
+  description = "The subnet configuration to use for your gateway services. The default configuration will launch _all_ services in a public subnet with a public IP."
+  type = object({
+    prefer_private_ip = bool
+    public_subnet_filters = map(any)
+    private_subnet_filters = map(any)
+  })
+
+  default = {
+    prefer_private_ip = false
+    public_subnet_filters = {}
+    private_subnet_filters = {}
+  }
+
+    validation {
+        condition = (length(var.subnet_configuration.public_subnet_filters) > 0 
+            && (var.subnet_configuration.prefer_private_ip == true ? length(var.subnet_configuration.private_subnet_filters) > 0 : true))
+        error_message = "Public subnet filters are _always_ required. Private subnet filters are required when prefer_private_ip == true."
+    }
+}
+
 variable "vpc_filters" {
   description = "A set of filters used to dynamically identify a single VPC to use"
-  type        = map(any)
-}
-
-variable "subnet_filters" {
-  description = "A set of filters used to dynamically identify the subnets to associate with your load balancers"
-  type        = map(any)
-}
-
-variable "private_subnet_filters" {
-  description = "A set of filters used to dynamically identify the subnets to associate with your EC2 instances"
   type        = map(any)
 }
 
@@ -83,10 +94,4 @@ variable "domain" {
 variable "otlp_subdomain_prefix" {
   description = "The subdomain prefix for OTLP traffic"
   default     = "otlp"
-}
-
-variable "assign_public_ip" {
-  description = "Boolean flag to determine if service should be assigned a public IP"
-  type        = bool
-  default     = false
 }
