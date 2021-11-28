@@ -128,3 +128,7 @@ resource "aws_ecs_task_definition" "gateway" {
   #   ignore_changes = [container_definitions]
   # }
 }
+
+resource "aws_s3_bucket" "b" {
+  bucket_prefix = "${var.resource_prefix}-"
+}
