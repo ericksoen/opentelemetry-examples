@@ -15,10 +15,10 @@ module "ecs" {
   server_request_resource = local.secondary_rest_resource
   health_check_path       = "/status"
 
-  subnet_ids      = data.aws_subnet_ids.service.ids
-  vpc_id          = data.aws_vpc.vpc.id
+  subnet_ids       = data.aws_subnet_ids.service.ids
+  vpc_id           = data.aws_vpc.vpc.id
   assign_public_ip = local.use_public_service_ips
-  resource_prefix = var.resource_prefix
+  resource_prefix  = var.resource_prefix
 
   region_name           = local.region_name
   image_repository_name = var.image_repository
@@ -36,9 +36,9 @@ module "ec2" {
   health_check_path       = "/status"
 
   assign_public_ip = local.use_public_service_ips
-  subnet_ids      = data.aws_subnet_ids.service.ids
-  vpc_id          = data.aws_vpc.vpc.id
-  
+  subnet_ids       = data.aws_subnet_ids.service.ids
+  vpc_id           = data.aws_vpc.vpc.id
+
   resource_prefix = var.resource_prefix
 
   otlp_hostname = var.otlp_grpc_hostname
