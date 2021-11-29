@@ -51,7 +51,7 @@ module "lambda" {
   region_name     = local.region_name
 
   otlp_hostname            = var.otlp_grpc_hostname
-  subnet_ids               = data.aws_subnet_ids.service.ids
+  subnet_ids               = local.lambda_subnets
   source_security_group_id = aws_security_group.alb_sg.id
 
   vpc_id = data.aws_vpc.vpc.id
@@ -63,7 +63,7 @@ module "proxy" {
   resource_prefix             = var.resource_prefix
   target_base_url             = "https://${module.app.record_name}"
   http_trace_gateway_base_url = "https://${var.otlp_http_hostname}"
-  subnet_ids                  = data.aws_subnet_ids.service.ids
+  subnet_ids                  = local.lambda_subnets
   source_security_group_id    = aws_security_group.alb_sg.id
 
   vpc_id = data.aws_vpc.vpc.id
