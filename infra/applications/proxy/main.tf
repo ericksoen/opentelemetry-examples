@@ -17,10 +17,14 @@ resource "aws_lambda_function" "lambda" {
     }
   }
 
-  vpc_config {
-    subnet_ids = var.subnet_ids
-    security_group_ids = [aws_security_group.lambda.id]
+  dynamic "vpc_config" {
+    for_each = aws_security_group.lambda
+    content {
+      subnet_ids = var.subnet_ids
+      security_group_ids = [vpc_config.value["id"]]
+    }
   }
+
   tracing_config {
     mode = "Active"
   }

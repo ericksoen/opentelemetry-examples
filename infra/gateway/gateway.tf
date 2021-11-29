@@ -18,9 +18,9 @@ resource "aws_ecs_service" "gateway" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = data.aws_subnet_ids.private.ids
+    subnets          = data.aws_subnet_ids.service.ids
     security_groups  = [aws_security_group.ecs.id]
-    assign_public_ip = var.assign_public_ip
+    assign_public_ip = local.use_public_service_ips
   }
 
   load_balancer {

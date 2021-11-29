@@ -21,15 +21,11 @@ module "refinery" {
 
   vpc_id = data.aws_vpc.vpc.id
 
-  # TODO: Ultimately, we should use a conditional to determine the
-  # whether to use the public or private network topology. For now,
-  # we'll use whatever subnets are returned by the private subnet
-  # data providers.
-  vpc_alb_subnets              = data.aws_subnet_ids.private.ids
-  redis_subnets                = data.aws_subnet_ids.private.ids
-  ecs_service_subnets          = data.aws_subnet_ids.private.ids
-  alb_internal                 = var.assign_public_ip
-  ecs_service_assign_public_ip = var.assign_public_ip
+  redis_subnets                = data.aws_subnet_ids.service.ids
+  ecs_service_subnets          = data.aws_subnet_ids.service.ids
+  ecs_service_assign_public_ip = local.use_public_service_ips
+  vpc_alb_subnets              = data.aws_subnet_ids.lb.ids
+
 
   depends_on = [
     local_file.rules_file

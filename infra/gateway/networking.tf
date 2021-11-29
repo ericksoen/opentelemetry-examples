@@ -10,11 +10,16 @@ data "aws_vpc" "vpc" {
   }
 }
 
-data "aws_subnet_ids" "public" {
+locals {
+  use_public_service_ips = var.subnet_configuration.prefer_private_ip == false
+  service_subnet_filters = var.subnet_configuration.prefer_private_ip ? var.subnet_configuration.private_subnet_filters : var.subnet_configuration.public_subnet_filters
+}
+
+data "aws_subnet_ids" "lb" {
   vpc_id = data.aws_vpc.vpc.id
 
   dynamic "filter" {
-    for_each = var.subnet_filters
+    for_each = var.subnet_configuration.public_subnet_filters
 
     content {
       name   = filter.key
@@ -23,11 +28,12 @@ data "aws_subnet_ids" "public" {
   }
 }
 
-data "aws_subnet_ids" "private" {
+data "aws_subnet_ids" "service" {
+
   vpc_id = data.aws_vpc.vpc.id
 
   dynamic "filter" {
-    for_each = var.private_subnet_filters
+    for_each = local.service_subnet_filters
 
     content {
       name   = filter.key

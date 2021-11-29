@@ -1,9 +1,11 @@
+#tfsec:ignore:aws-elbv2-alb-not-public:exp:2022-01-31 tfsec:ignore:aws-elb-drop-invalid-headers:exp:2022-01-31
 resource "aws_lb" "alb" {
   name               = "${var.resource_prefix}-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = data.aws_subnet_ids.public.ids
+  subnets            = data.aws_subnet_ids.lb.ids
+
 }
 
 resource "aws_lb_listener" "https" {

@@ -1,4 +1,6 @@
 resource "aws_security_group" "lambda" {
+  count = length(var.subnet_ids) > 0 ? 1 : 0
+  
   name        = "${var.resource_prefix}-lambda-sg"
   description = "Allow TLS inbound traffic"
   vpc_id      = var.vpc_id
