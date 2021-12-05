@@ -2,7 +2,7 @@
 
 **Note**: All infrastructure deployments take some input variables to appropriately configure your infrastructure.
 
-Some variables provide default values, e.g., `demo` as the subdomain to attach to the demo landing page with useful links, while others are more bespoke. Please see the corresponding `README.md` file for the infrastructure component to see which variables provide default values and which do not.
+Some variables provide default values, e.g., `demo` as the subdomain for the landing page with useful links, while others are more bespoke. Please see the corresponding `README.md` file for the infrastructure component to see which variables provide default values and which do not.
 
 Each folder contains a file named `example-variables.tfvars` with variables that cannot provide default values for one reason or another (access keys, network configuration, etc.).
 
