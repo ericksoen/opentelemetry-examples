@@ -8,13 +8,13 @@ These templates and examples are _not_ currently intended for production use (pl
 
 ## OpenTelemetry
 
-OpenTelemetry is a vendor-agnostic observability framework for instrumenting, generating, collecting, and exporting telmetry data. The OpenTelemetry Protocol (OTLP) is vendor neutral, which allows you to send telemetry to multiple backends or change backends entirely&mdash;all without rewriting your code.
+OpenTelemetry is a vendor-agnostic observability framework for instrumenting, generating, collecting, and exporting telemetry data. The OpenTelemetry Protocol (OTLP) is vendor neutral. **This allows you to send telemetry to multiple backends or change backends entirely&mdash;_all without rewriting your code_.**
 
 OpenTelemetry collectors include both **Agents**, a collector instance running with the application or on the same host as a sidecar or daemonset, and a **Gateway**, a standalone service deployed once per data center or region.
 
 The Agent collectors enables applications to offload responsibilities including batching, retry, encryption, and more. This Agent can also enhance telemetry data with metadata such as custom tags or infrastructure information. This Agent pattern frequently simplifies the client implementation of the OpenTelemetry instrumentation. 
 
-The Gateway collectors run as a standalone service and can offer advanced capabilities that include tail-based sampling. A Gateway collector can limit the number of egress points required to send data and consolidate API token management. If a gateway cluster is deployed, it usually receives data from Agents deployed within an environment.
+The Gateway collectors run as a standalone service and can offer advanced capabilities that include tail-based sampling. A Gateway collector can limit the number of egress points required to send data and consolidate API token management. If a gateway cluster is deployed, it usually receives data from Agent collectors deployed within an environment.
 
 Enterprise vendors who support OpenTelemetry Protocol (OTLP) include AWS, Datadog, Dynatrace, HoneyComb, and New Relic (among others).
 
@@ -37,11 +37,13 @@ The [examples](./examples/README.md) folder has some code samples to help famili
 
 ## OpenTelemetry and Application Architecture
 
-The architecture diagram below shows the hosting pattern for [OpenTelemetry collectors](https://opentelemetry.io/docs/concepts/data-collection/#deployment) and our sample application. 
+The architecture diagram below shows the hosting pattern for [OpenTelemetry collectors](https://opentelemetry.io/docs/concepts/data-collection/#deployment) and our sample application. The available routes to users of our sample service are displayed in magenta while the flow of telemetry data is shown in green.
 
 ![Open Telemetry Hosting Architecture](./images/OpenTelemetryArchitecture.png)
 
-Second, the OpenTelemetry configuration for the Gateway service transmits data to [HoneyComb](https://www.honeycomb.io/blog/all-in-on-opentelemetry/). If you're not interested in transmitting telemetry to HoneyComb, remove these configuration lines. Alternatively, HoneyComb has an accessible and easy to use [free tier](https://www.honeycomb.io/pricing/) that you may want to consider.
+The bottom right corner of the architecture diagram shows the available Gateway collector exporters for this sample implementation. AWS X-ray is available by default while Honeycomb, Lightstep, and New Relic are all available via optional configuration.
+
+Providing an API key for each of the vendors as an input variable to your Gateway infrastructure will automatically enable the exporter to that vendor back end.
 
 ## Security
 
@@ -51,29 +53,21 @@ The example authentication flow is now included in a separate, [public repositor
 
 ## Deployment
 
-Before you deploy any application infrastructure, you first need to create the images (Gateway, Agent, and Application) and package (Lambda) that the infrastructure depends on. 
+Please see the [infrastructure README](./infra/README.md) for additional guidance on deploying the infrastructure used in this demo (includes both the Gateway and sample application).
 
-Creating the images and packages can be executed in any sequence, but the recommendation is to follow the same order used to deploy the infrastructure:
-
-1. OpenTelemetry Agent Collector image
-1. Build Application
-   +  Note: this currently excludes the application build process for the EC2 service endpoint, which is packaged during the infrastructure deployment as S3 objects and then installed as part of application bootstrapping
-
-Once you have created the necessary images and packages, deploy the infrastructure components in the recommend sequence. Please see the [infrastructure README](./infra/README.md) for additional guidance.
+The sample application exposes the magenta routes from our architecture diagram above and create the necessary OpenTelemetry Agent collector to export data to our Gateway. The Gateway infrastructure creates the OpenTelemetry Gateway collector to receive data from agents and export to one or more of the configured backends.
 
 ### Generating trace data
 
-After packaging and deploying your applications, you can start to generate trace data and visualize it via one or more of the configured backends (Jaeger, HoneyComb, etc.).
+After packaging and deploying your applications, you can start to generate trace data and visualize it via the configured backend.
 
-To generate trace data, navigate to the demo site landing page (a Terraform output value from the application infrastructure deployment).
+To generate trace data, navigate to the demo site landing page, typically `demo.your-domain.com`. This value is also output value from the application infrastructure deployment and click on any of the displayed links.
 
 ![Demo Site Landing Page](./images/demo-site-landing-page.png)
 
-The landing page includes links to make HTTP requests to each of the applications behind our load balancer, `/ecs`, `/ec2`, and `/lambda`, respectively. 
+Each of the links will make a request to the `/proxy` service that forwards requests to the appropriate service.
 
-The request flow from the root endpoint is as follows: `/ecs --> /ec2 --> /lambda`. Each of the endpoints can also be invoked independently and calls any downstream endpoints.
-
-The landing page also includes a link to the Jaeger UI. Jaeger is an open source application that provides an ingest endpoint and UI. This allows you to visualize trace data, especially if you elect to disable HoneyComb ingest.
+**Note:** the proxy service exports data directly to the OpenTelemetry collector over HTTP using standard HTTP request libraries (see the [LightStep guide](https://docs.lightstep.com/docs/send-otlp-over-http-to-lightstep#common-use-cases-for-otlphttp) for other common use cases that might fit this pattern). 
 
 ## Assumptions and Caveats
 
@@ -94,7 +88,6 @@ Please note that your experience deploying this infrastructure may differ if som
 The caveats noted below attempt to describe some of the technical issues that limit running this service as a production-quality implementation.
 
 1. Some secrets such as the HoneyComb write key appear in plain-text in both the AWS SSM Parameter Store and the Terraform state file
-1. ECR images are pushed to a single repository and differentiated by the image tag
 1. Other than secure communication offer HTTPS, this example implementation provides minimal direction on securing your OpenTelemetry collector (see [Security](#Security))
 
 ## Open Issues
