@@ -9,6 +9,7 @@ const MAX_DELAY_MS = 1200;
 const tracer = opentelemetry.trace.getTracer('example-basic-tracer-node');
 module.exports.handler = async (event) => {
   const headers = event.headers;
+
   const faults = 'x-fault' in headers ? headers['x-fault'] : '00';
 
   if (faults.length != 2) {
@@ -38,13 +39,6 @@ module.exports.handler = async (event) => {
   const todoItem = await axios(
     `https://jsonplaceholder.typicode.com/todos/${todo_id}`
   );
-
-  const parentSpan = opentelemetry.trace.getSpan(
-    opentelemetry.context.active()
-  );
-
-  parentSpan.updateName('resolve-todos');
-  parentSpan.setAttribute('todo_id', todo_id);
 
   const span = tracer.startSpan('process-todo-response', {
     kind: 1,
