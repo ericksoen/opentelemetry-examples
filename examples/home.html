@@ -5,10 +5,16 @@
           <a target="_blank" href="http://127.0.0.1:16686">Jaeger Site to visualize traces</a>
       </li>
         <li>
-            <a target="_blank" href="http://127.0.0.1:5001/proxy">Proxies requests to a downstream service</a>
+            <a target="_blank" href="http://127.0.0.1:5001/proxy?target=python">Proxies requests to an instrumented, downstream Python service</a>
         </li>
         <li>
-            <a target="_blank" href="http://127.0.0.1:5000/sample">Downstream service that receives proxied or direct requests  </a>
+            <a target="_blank" href="http://127.0.0.1:5000/sample">Downstream Python service that receives proxied or direct requests  </a>
+        </li>
+        <li>
+          <a target="_blank" href="http://127.0.0.1:5001/proxy?target=dotnet">Proxies requests to an instrumented, downstream dotnet service</a>
+        </li>
+        <li>
+            <a target="_blank" href="http://127.0.0.1:8080/weatherforecast">Downstream dotnet service that receives proxied or direct requests  </a>
         </li>
         <li>
           <a target="_blank" href="http://127.0.0.1:13133"

@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, request
 import requests
 import os
 import time
@@ -6,15 +6,19 @@ import secrets
 import json
 
 OTLP_HTTP_TARGET = os.getenv('OTLP_HTTP_TARGET')
-DOWNSTREAM_SERVICE_TARGET = os.getenv('DOWNSTREAM_SERVICE_TARGET')
+DOWNSTREAM_PYTHON_TARGET = os.getenv('DOWNSTREAM_PYTHON_TARGET')
+DOWNSTREAM_DOTNET_TARGET = os.getenv('DOWNSTREAM_DOTNET_TARGET')
 
 print(f"The OTLP target = {OTLP_HTTP_TARGET}")
 
 if not OTLP_HTTP_TARGET:
     raise "Did not find OTLP/HTTP target for application telemetry. Shutting down..."
 
-if not DOWNSTREAM_SERVICE_TARGET:
-    raise "Did not find service target for. Shutting down..."
+if not DOWNSTREAM_PYTHON_TARGET:
+    raise "Did not find service target for Python example. Shutting down..."
+
+if not DOWNSTREAM_DOTNET_TARGET:
+    raise "Did not find service target for Python example. Shutting down..."
 
 app = Flask(__name__)
 
@@ -104,6 +108,22 @@ def hello():
     print(trace_id)
     start_time = time.time_ns()
 
+    queryStringParams = request.args
+
+    if "target" not in queryStringParams:
+        return {"traceId": trace_id, "errorMessage": "Expected: '?target=\{name\} where name is one of [\"dotnet\", \"python\"]'"}, 400
+
+    target = queryStringParams["target"].lower()
+
+    request_url = None
+    if target == "dotnet":
+        request_url = DOWNSTREAM_DOTNET_TARGET
+    elif target == "python":
+        request_url = DOWNSTREAM_PYTHON_TARGET
+
+    if not request_url:
+        return {"traceId": trace_id, "errorMessage": "Expected: '?target=\{name\} where name is one of [\"dotnet\", \"python\"]'"}, 400
+
     # Generate a w3c traceparent header and inject into downstream
     # service calls
     headers = {
@@ -111,7 +131,7 @@ def hello():
         "content-type": "application/json",
     }
 
-    resp = requests.get(DOWNSTREAM_SERVICE_TARGET, headers = headers)
+    resp = requests.get(request_url, headers = headers)
     end_time = time.time_ns()
     otlp_http_body = span_factory(trace_id, span_id, start_time, end_time, resp.status_code, "/sample", "GET")
     trace_resp = requests.post(f"{OTLP_HTTP_TARGET}/v1/traces", data = otlp_http_body, headers = {
