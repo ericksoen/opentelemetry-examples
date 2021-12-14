@@ -16,3 +16,9 @@ template.sh
 
 # Node artifacts
 node_modules
+
+# Dotnet artifacts
+bin
+obj
+out
+.vs

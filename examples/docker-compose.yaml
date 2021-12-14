@@ -6,12 +6,14 @@ services:
     ports:
       - "5001:5000"
     depends_on:
-      - downstream
+      - downstream-dotnet
+      - downstream-python
     environment:
       - OTLP_HTTP_TARGET=http://gateway:4318
-      - DOWNSTREAM_SERVICE_TARGET=http://downstream:5000/sample
+      - DOWNSTREAM_PYTHON_TARGET=http://downstream-python:5000/sample
+      - DOWNSTREAM_DOTNET_TARGET=http://downstream-dotnet:8080/weatherforecast
       - FLASK_APP=proxy
-  downstream:
+  downstream-python:
     build:
       context: .
     ports:
@@ -21,11 +23,26 @@ services:
     environment:
       - OTLP_TARGET=http://agent:4317
       - FLASK_APP=app
+  downstream-dotnet:
+    build: 
+      context: ./dotnet/
+    environment:
+      - LISTEN_ADDRESS=0.0.0.0:8080
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://agent:4318/v1/traces
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - agent
   agent:
     image: otel/opentelemetry-collector:latest
-    command: ["--config=/etc/otel-config.yaml", "--log-level=DEBUG"]
+    command: ["--config=/etc/otel-config.yaml", "--log-level=INFO"]
     ports:
       - "4317:4137"
+      # Avoid port collission on the OTLP HTTP default port
+      # The dotnet OpenTelemetry SDK doesn't consistently
+      # return success for gRPC calls
+      - "4320:4318"
       - "8888:8888"      
       - "13133:13133"
       - "55679:55679"
