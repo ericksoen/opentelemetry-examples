@@ -12,10 +12,19 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.sdk.extension.aws.resource.ecs import (
+    AwsEcsResourceDetector,
+)
+from opentelemetry.sdk.resources import get_aggregated_resources
 
 trace.set_tracer_provider(
     TracerProvider(
-        resource=Resource.create({SERVICE_NAME: "ecs-service"})
+        resource=get_aggregated_resources(
+            [
+                AwsEcsResourceDetector(),
+            ],
+            Resource.create({SERVICE_NAME: "ecs-service"})
+        )
     )
 )
 
