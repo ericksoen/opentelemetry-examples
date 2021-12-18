@@ -35,6 +35,7 @@ data "template_file" "homepage" {
     root_service_path      = local.primary_rest_resource
     secondary_service_path = local.secondary_rest_resource
     tertiary_service_path  = local.tertiary_rest_resource
+    quatenary_service_path = local.quatenary_rest_resource
   }
 }
 
@@ -98,6 +99,22 @@ resource "aws_lb_listener_rule" "lambda" {
   condition {
     path_pattern {
       values = ["/${local.tertiary_rest_resource}"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "lambda_python" {
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 104
+
+  action {
+    type             = "forward"
+    target_group_arn = module.lambda_python.target_group_arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/${local.quatenary_rest_resource}"]
     }
   }
 }
