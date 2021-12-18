@@ -1,8 +1,8 @@
 opentelemetry-api
 opentelemetry-sdk
-opentelemetry-exporter-jaeger
 opentelemetry-instrumentation-flask
 opentelemetry-instrumentation-requests
 flask
 requests
 opentelemetry-exporter-otlp
+opentelemetry-sdk-extension-aws
