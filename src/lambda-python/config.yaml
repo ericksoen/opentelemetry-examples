@@ -1,0 +1,20 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+exporters:
+  otlp:
+    endpoint: ${OTLP_GATEWAY_HOST}:443
+  logging:
+    logLevel: debug
+  awsxray:
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [otlp, logging]
+    metrics:
+      receivers: [otlp]
+      exporters: [logging]

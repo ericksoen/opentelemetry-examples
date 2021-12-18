@@ -142,7 +142,7 @@ def handler(event, context):
             raise BadRequestError(f"Expected event key \"queryStringParameters.target\" not set")
 
         target = target.lower()
-        if target not in ['ecs', 'ec2', 'lambda']:
+        if target not in ['ecs', 'ec2', 'lambda', 'lambda-python']:
             message_response.update(BAD_REQUEST_MESSAGE)
             raise BadRequestError(F"Expected one of [\"ecs\", \"ecs\", \"lambda\"]. Got {target}.")
 
