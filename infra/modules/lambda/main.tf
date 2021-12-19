@@ -19,9 +19,12 @@ resource "aws_security_group" "lambda" {
   }
 
   egress {
+    description = "Allow return traffic to internet"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
+
+    #tfsec:ignore:aws-vpc-no-public-egress-sg
     cidr_blocks = ["0.0.0.0/0"]
 
   }
