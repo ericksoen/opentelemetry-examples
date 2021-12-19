@@ -54,6 +54,6 @@ variable "otlp_http_hostname" {
 }
 
 variable "use_existing_cloudwatch_log_group" {
-    description = "Indicates whether the Lambda CloudWatch group already exists"
-    default = true
+  description = "Indicates whether the Lambda CloudWatch group already exists"
+  default     = true
 }

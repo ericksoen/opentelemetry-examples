@@ -35,7 +35,7 @@ resource "aws_iam_role_policy_attachment" "xray" {
 
 resource "aws_iam_role_policy_attachment" "vpc" {
 
-  count = local.create_network ? 1 : 0
-  role = aws_iam_role.iam_for_lambda.name
+  count      = local.create_network ? 1 : 0
+  role       = aws_iam_role.iam_for_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
