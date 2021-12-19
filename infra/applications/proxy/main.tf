@@ -66,7 +66,8 @@ module "proxy_alias" {
 
   function_name = module.proxy.lambda_function_arn
   function_version = module.proxy.lambda_function_version
-
+  create_version_allowed_triggers = false
+  
   allowed_triggers = {
     LoadBalancer = {
       service = "elasticloadbalancing"
