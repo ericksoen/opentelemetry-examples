@@ -22,3 +22,7 @@ variable "source_security_group_id" {
 variable "vpc_id" {
     description = "The VPC for the instance"
 }
+
+variable "use_existing_cloudwatch_log_group" {
+    description = "Indicates whether the Lambda CloudWatch group already exists"
+}

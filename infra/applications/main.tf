@@ -56,7 +56,7 @@ module "lambda" {
   region_name     = local.region_name
 
   otlp_hostname            = var.otlp_grpc_hostname
-
+  use_existing_cloudwatch_log_group = var.use_existing_cloudwatch_log_group
 }
 
 module "lambda_python" {
