@@ -52,3 +52,8 @@ variable "otlp_grpc_hostname" {
 variable "otlp_http_hostname" {
   description = "The URL for receiving OTLP traces via http"
 }
+
+variable "use_existing_cloudwatch_log_group" {
+  description = "Indicates whether the Lambda CloudWatch group already exists"
+  default     = true
+}
