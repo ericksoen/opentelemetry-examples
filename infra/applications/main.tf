@@ -80,5 +80,6 @@ module "proxy" {
   subnet_ids                  = local.lambda_subnets
   source_security_group_id    = aws_security_group.alb_sg.id
 
+  use_existing_cloudwatch_log_group = true
   vpc_id = data.aws_vpc.vpc.id
 }
