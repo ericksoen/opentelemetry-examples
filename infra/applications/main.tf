@@ -48,38 +48,44 @@ module "ec2" {
 module "lambda" {
   source = "./lambda"
 
+  vpc_id = data.aws_vpc.vpc.id
+  subnet_ids               = local.lambda_subnets
+  source_security_group_id = aws_security_group.alb_sg.id
+  
   resource_prefix = var.resource_prefix
   region_name     = local.region_name
 
   otlp_hostname            = var.otlp_grpc_hostname
-  subnet_ids               = local.lambda_subnets
-  source_security_group_id = aws_security_group.alb_sg.id
 
-  vpc_id = data.aws_vpc.vpc.id
 }
 
 module "lambda_python" {
   source = "./lambda-python"
 
-  resource_prefix = "${var.resource_prefix}-python"
-  region_name     = local.region_name
-
-  otlp_hostname            = var.otlp_grpc_hostname
+  vpc_id = data.aws_vpc.vpc.id
   subnet_ids               = local.lambda_subnets
   source_security_group_id = aws_security_group.alb_sg.id
 
-  vpc_id = data.aws_vpc.vpc.id
+  resource_prefix = "${var.resource_prefix}-python"
+  region_name     = local.region_name
+
+  
+  otlp_hostname            = var.otlp_grpc_hostname
+  use_existing_cloudwatch_log_group = var.use_existing_cloudwatch_log_group
+  
 }
 
 module "proxy" {
   source = "./proxy"
 
+  vpc_id = data.aws_vpc.vpc.id
+  subnet_ids                  = local.lambda_subnets
+  source_security_group_id    = aws_security_group.alb_sg.id
+  
   resource_prefix             = var.resource_prefix
   target_base_url             = "https://${module.app.record_name}"
   http_trace_gateway_base_url = "https://${var.otlp_http_hostname}"
-  subnet_ids                  = local.lambda_subnets
-  source_security_group_id    = aws_security_group.alb_sg.id
 
-  use_existing_cloudwatch_log_group = true
-  vpc_id = data.aws_vpc.vpc.id
+  use_existing_cloudwatch_log_group = var.use_existing_cloudwatch_log_group
+
 }
