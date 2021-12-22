@@ -6,12 +6,12 @@ services:
     ports:
       - "5001:5000"
     depends_on:
-      - downstream-dotnet
+      - downstream-dotnet-core
       - downstream-python
     environment:
       - OTLP_HTTP_TARGET=http://gateway:4318
       - DOWNSTREAM_PYTHON_TARGET=http://downstream-python:5000/sample
-      - DOWNSTREAM_DOTNET_TARGET=http://downstream-dotnet:8080/weatherforecast
+      - DOWNSTREAM_DOTNET_TARGET=http://downstream-dotnet-core:8080/weatherforecast
       - FLASK_APP=proxy
   downstream-python:
     build:
@@ -23,9 +23,9 @@ services:
     environment:
       - OTLP_TARGET=http://agent:4317
       - FLASK_APP=app
-  downstream-dotnet:
+  downstream-dotnet-core:
     build: 
-      context: ./dotnet/
+      context: ./dotnet-core/
     environment:
       - LISTEN_ADDRESS=0.0.0.0:8080
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://agent:4318/v1/traces
@@ -38,11 +38,6 @@ services:
     image: otel/opentelemetry-collector:latest
     command: ["--config=/etc/otel-config.yaml", "--log-level=INFO"]
     ports:
-      - "4317:4137"
-      # Avoid port collission on the OTLP HTTP default port
-      # The dotnet OpenTelemetry SDK doesn't consistently
-      # return success for gRPC calls
-      - "4320:4318"
       - "8888:8888"      
       - "13133:13133"
       - "55679:55679"
@@ -54,9 +49,6 @@ services:
     image: otel/opentelemetry-collector:latest
     command: ["--config=/etc/otel-config.yaml", "--log-level=DEBUG"]
     ports:
-      - "4318:4318"
-      # For reasons that are not obvious to me, host:port remappings for
-      # gRPC telemetry only worked when the ports mapped are identical 
       - "7134:7134"
       - "8889:8888"
       - "13134:13133"
@@ -69,5 +61,4 @@ services:
     image: jaegertracing/all-in-one
     command: ["--log-level=ERROR"]
     ports:
-      - "14250:14250"
       - "16686:16686"
