@@ -6,12 +6,12 @@ services:
     ports:
       - "5001:5000"
     depends_on:
-      - downstream-dotnet
+      - downstream-dotnet-core
       - downstream-python
     environment:
       - OTLP_HTTP_TARGET=http://gateway:4318
       - DOWNSTREAM_PYTHON_TARGET=http://downstream-python:5000/sample
-      - DOWNSTREAM_DOTNET_TARGET=http://downstream-dotnet:8080/weatherforecast
+      - DOWNSTREAM_DOTNET_TARGET=http://downstream-dotnet-core:8080/weatherforecast
       - FLASK_APP=proxy
   downstream-python:
     build:
@@ -23,9 +23,9 @@ services:
     environment:
       - OTLP_TARGET=http://agent:4317
       - FLASK_APP=app
-  downstream-dotnet:
+  downstream-dotnet-core:
     build: 
-      context: ./dotnet/
+      context: ./dotnet-core/
     environment:
       - LISTEN_ADDRESS=0.0.0.0:8080
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://agent:4318/v1/traces
