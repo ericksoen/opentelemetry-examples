@@ -46,6 +46,7 @@ namespace app
             services.AddOpenTelemetryTracing((builder) => builder
                 .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("otlp-dotnet-demo"))
                 .AddAspNetCoreInstrumentation()
+                .AddSource("Dotnet.Api.Controllers")
                 .AddHttpClientInstrumentation()
                 .AddConsoleExporter()
                 .AddOtlpExporter(otlpOptions =>
