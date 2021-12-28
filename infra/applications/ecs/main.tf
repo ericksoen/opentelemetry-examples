@@ -49,15 +49,6 @@ resource "aws_ecs_service" "ecs" {
 
 }
 
-locals {
-
-  # As of 11/20/21, versions subsequent to v0.13.0 do not correctly
-  # expand environment variables and instead treat them as string literals
-  # Pin to the last known working version until the issue is resolved
-  # See: https://github.com/aws-observability/aws-otel-collector/issues/748
-  aws_otel_collector_image_version = "v0.13.0"
-}
-
 resource "aws_ecs_task_definition" "app" {
   family                   = "${var.resource_prefix}"
   network_mode             = "awsvpc"
@@ -105,7 +96,7 @@ resource "aws_ecs_task_definition" "app" {
     },
     {
       name      = "${var.resource_prefix}-agent"
-      image     = "amazon/aws-otel-collector:${local.aws_otel_collector_image_version}"
+      image     = "amazon/aws-otel-collector"
       essential = true
       logConfiguration = {
         logDriver = "awslogs"
