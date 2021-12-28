@@ -9,7 +9,7 @@ __pycache__
 !*example-variables.tfvars
 .terraform
 terraform.tfstate*
-.terraform.lock.hcl
+.terraform.lock*
 
 # Auto-generated bootstrap script
 template.sh
@@ -22,4 +22,5 @@ bin
 obj
 out
 .vs
-*.csproj.user
+packages/
+*.user
