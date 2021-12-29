@@ -22,3 +22,4 @@ bin
 obj
 out
 .vs
+*.csproj.user
