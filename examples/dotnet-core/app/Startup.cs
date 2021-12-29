@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,26 +34,33 @@ namespace app
         {
             services.AddControllers();
 
-            // I have not successfully configured a dotnet application to export to an insecure gRPC
-            // port. The extant documentation suggests that the combination of a .NET Core 3.1.x app
-            // and a config switch to allow Http2Unencrypted support should enable this behavior, but I have yet to observe it.
+            // Permit export to an insecure gRPC port. This config switch is required for a .NET Core 3.1.x app
+            // Export over an insecure gRPC port is the default behavior for OpenTelemetry Agent Collectors
             // See: https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/README.md#special-case-when-using-insecure-channel
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
-            // Instead, I'm using OpenTelemetry.Exporter.OpenTelemetryProtocol v1.2.0-rc1 to export over HTTP:
-            // See: https://github.com/open-telemetry/opentelemetry-dotnet/blob/core-1.2.0-rc1/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/OtlpExporterOptions.cs
-            
             var otlpTarget = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT");
 
+            var framework = Assembly
+                .GetEntryAssembly()?
+                .GetCustomAttribute<TargetFrameworkAttribute>()?
+                .FrameworkName;
+            
             Console.WriteLine($"The current OTLP target = {otlpTarget}");
             services.AddOpenTelemetryTracing((builder) => builder
-                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("otlp-dotnet-demo"))
+                .SetResourceBuilder(
+                    ResourceBuilder.CreateDefault()
+                        .AddService("otlp-dotnet-demo")
+                        .AddAttributes(new Dictionary<string, object>{ {"dotnetFramework", framework} } )
+                )
                 .AddAspNetCoreInstrumentation()
                 .AddSource("Dotnet.Api.Controllers")
                 .AddHttpClientInstrumentation()
+
                 .AddConsoleExporter()
                 .AddOtlpExporter(otlpOptions =>
                 {
-                    otlpOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
+                    otlpOptions.Protocol = OtlpExportProtocol.Grpc;
                     otlpOptions.Endpoint = new Uri(otlpTarget);
                 }));            
         }

@@ -28,7 +28,7 @@ services:
       context: ./dotnet-core/
     environment:
       - LISTEN_ADDRESS=0.0.0.0:8080
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://agent:4318/v1/traces
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://agent:4317
       - ASPNETCORE_URLS=http://+:8080
     ports:
       - "8080:8080"
@@ -38,6 +38,7 @@ services:
     image: otel/opentelemetry-collector:latest
     command: ["--config=/etc/otel-config.yaml", "--log-level=INFO"]
     ports:
+      - "4317:4317"
       - "8888:8888"      
       - "13133:13133"
       - "55679:55679"
@@ -49,7 +50,6 @@ services:
     image: otel/opentelemetry-collector:latest
     command: ["--config=/etc/otel-config.yaml", "--log-level=DEBUG"]
     ports:
-      - "7134:7134"
       - "8889:8888"
       - "13134:13133"
       - "55680:55679"
