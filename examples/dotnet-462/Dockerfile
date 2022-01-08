@@ -5,8 +5,7 @@ WORKDIR /app
 COPY *.sln .
 COPY app/*.csproj ./app/
 COPY app/*.config ./app/
-RUN nuget sources list
-RUN nuget restore
+RUN nuget restore   
 
 # copy everything else and build app
 COPY app/. ./app/
