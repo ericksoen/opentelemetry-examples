@@ -8,15 +8,15 @@ module "alb_lb" {
   load_balancer_type = "application"
   internal           = false
 
-  vpc_id      = data.aws_vpc.vpc.id
-  subnets            = data.aws_subnet_ids.lb.ids
-  security_groups    = [aws_security_group.alb.id]
+  vpc_id          = data.aws_vpc.vpc.id
+  subnets         = data.aws_subnet_ids.lb.ids
+  security_groups = [aws_security_group.alb.id]
   target_groups = [
     {
-      name        = "${var.resource_prefix}-telemetry-tg"
+      name             = "${var.resource_prefix}-telemetry-tg"
       backend_protocol = "HTTP"
-      backend_port = 55679
-      target_type = "ip"
+      backend_port     = 55679
+      target_type      = "ip"
       health_check = {
         enabled             = true
         port                = 13133
@@ -26,10 +26,10 @@ module "alb_lb" {
       }
     },
     {
-      name     = "${var.resource_prefix}-otlp-http-tg"
+      name             = "${var.resource_prefix}-otlp-http-tg"
       backend_port     = 4318
       backend_protocol = "HTTP"
-      target_type = "ip"
+      target_type      = "ip"
       health_check = {
         port                = 13133
         healthy_threshold   = 2
@@ -39,10 +39,10 @@ module "alb_lb" {
 
     },
     {
-      name        = "${var.resource_prefix}-metrics-tg"
-      backend_port        = 8888
-      backend_protocol    = "HTTP"
-      target_type = "ip"
+      name             = "${var.resource_prefix}-metrics-tg"
+      backend_port     = 8888
+      backend_protocol = "HTTP"
+      target_type      = "ip"
       health_check = {
         enabled             = true
         port                = 13133
@@ -56,13 +56,13 @@ module "alb_lb" {
 
   https_listeners = [
     {
-      port = 443
-      protocol = "HTTPS"
+      port            = 443
+      protocol        = "HTTPS"
       certificate_arn = module.alb.certificate_arn
-      action_type = "fixed-response"
+      action_type     = "fixed-response"
       fixed_response = {
         message_body = "{\"message\": \"hello-world\"}"
-        status_code = "200"
+        status_code  = "200"
         content_type = "application/json"
       }
     }
@@ -71,25 +71,25 @@ module "alb_lb" {
   https_listener_rules = [
     {
       https_listener_index = 0
-      priority = 4
+      priority             = 4
       actions = [
         {
-          type = "forward"
+          type               = "forward"
           target_group_index = 0
 
         }
       ]
 
-      conditions =  [{
+      conditions = [{
         path_patterns = ["/debug/*"]
-      }]      
+      }]
     },
     {
       https_listener_index = 0
-      priority = 6
+      priority             = 6
       actions = [
         {
-          type = "forward"
+          type               = "forward"
           target_group_index = 1
         }
       ]
@@ -99,10 +99,10 @@ module "alb_lb" {
     },
     {
       https_listener_index = 0
-      priority = 5
+      priority             = 5
       actions = [
         {
-          type = "forward"
+          type               = "forward"
           target_group_index = 2
         }
       ]
