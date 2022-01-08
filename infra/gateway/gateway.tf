@@ -30,22 +30,23 @@ resource "aws_ecs_service" "gateway" {
     container_port = 4317
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.otlp_http.arn
-    container_name   = var.resource_prefix
-
-    container_port = 4318
-  }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.telemetry.arn
+    target_group_arn = module.alb_lb.target_group_arns[0]
     container_name   = var.resource_prefix
 
     container_port = 55679
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.metrics.arn
+    target_group_arn = module.alb_lb.target_group_arns[1]
+    container_name   = var.resource_prefix
+
+    container_port = 4318
+  }
+
+  load_balancer {
+    target_group_arn = module.alb_lb.target_group_arns[2]
     container_name   = var.resource_prefix
 
     container_port = 8888
@@ -54,9 +55,6 @@ resource "aws_ecs_service" "gateway" {
   depends_on = [
     aws_iam_role.task,
     aws_lb_target_group.otlp,
-    aws_lb_target_group.telemetry,
-    aws_lb_target_group.metrics,
-    aws_lb_target_group.otlp_http
   ]
 }
 
