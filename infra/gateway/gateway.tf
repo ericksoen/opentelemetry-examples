@@ -24,7 +24,7 @@ resource "aws_ecs_service" "gateway" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.otlp.arn
+    target_group_arn = module.nlb_lb.target_group_arns[0]
     container_name   = var.resource_prefix
 
     container_port = 4317
@@ -54,7 +54,6 @@ resource "aws_ecs_service" "gateway" {
 
   depends_on = [
     aws_iam_role.task,
-    aws_lb_target_group.otlp,
   ]
 }
 
