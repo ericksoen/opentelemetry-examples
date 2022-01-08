@@ -15,6 +15,7 @@ terraform state mv aws_lb_listener_rule.metrics module.alb_lb.aws_lb_listener_ru
 terraform state mv aws_lb_target_group.otlp_http module.alb_lb.aws_lb_target_group.main[1]
 terraform state mv aws_lb_target_group.telemetry module.alb_lb.aws_lb_target_group.main[0]
 terraform state mv aws_lb_target_group.metrics module.alb_lb.aws_lb_target_group.main[2]
+terraform state mv aws_lb_listener_certificate.otlp_http module.alb_lb.aws_lb_listener_certificate.https_listener[0]
 ```
 
 1. Migrate the NLB and associated resources

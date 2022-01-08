@@ -113,9 +113,9 @@ module "alb_lb" {
 
   ]
 
-}
+  extra_ssl_certs = [{
+    certificate_arn = module.alb.certificate_arn
+    https_listener_index = 0
+  }]
 
-resource "aws_lb_listener_certificate" "otlp_http" {
-  listener_arn    = module.alb_lb.https_listener_arns[0]
-  certificate_arn = module.alb.certificate_arn
 }
