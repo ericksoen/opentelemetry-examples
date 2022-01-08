@@ -114,7 +114,7 @@ module "alb_lb" {
   ]
 
   extra_ssl_certs = [{
-    certificate_arn = module.alb.certificate_arn
+    certificate_arn      = module.alb.certificate_arn
     https_listener_index = 0
   }]
 

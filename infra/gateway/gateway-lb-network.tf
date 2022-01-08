@@ -6,8 +6,8 @@ module "nlb_lb" {
   load_balancer_type = "network"
   internal           = true
 
-  vpc_id          = data.aws_vpc.vpc.id
-  subnets         = data.aws_subnet_ids.lb.ids
+  vpc_id  = data.aws_vpc.vpc.id
+  subnets = data.aws_subnet_ids.lb.ids
   target_groups = [
     {
       name             = "${var.resource_prefix}-tg"
