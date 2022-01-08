@@ -1,16 +1,3 @@
-resource "aws_lb_target_group" "ec2" {
-  name     = "${var.resource_prefix}-lb-ec2-tg"
-  port     = 5001
-  protocol = "HTTP"
-  vpc_id   = var.vpc_id
-
-  health_check {
-    enabled  = true
-    path     = "${var.health_check_path}"
-    interval = 30
-  }
-}
-
 resource "aws_ssm_parameter" "lambda" {
   name  = "lambda-target-url"
   type  = "String"
@@ -76,7 +63,7 @@ resource "aws_autoscaling_group" "app" {
   force_delete              = true
   vpc_zone_identifier       = var.subnet_ids
 
-  target_group_arns = [aws_lb_target_group.ec2.arn]
+  target_group_arns = [var.target_group_arn]
   launch_template {
     id      = aws_launch_template.instance.id
     version = "$Latest"

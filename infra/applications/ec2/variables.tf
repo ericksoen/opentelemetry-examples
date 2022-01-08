@@ -36,3 +36,7 @@ variable "resource_prefix" {
 variable "otlp_hostname" {
 
 }
+
+variable "target_group_arn" {
+
+}

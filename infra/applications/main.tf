@@ -25,6 +25,8 @@ module "ecs" {
   image_repository_name = var.image_repository
 
   otlp_hostname = var.otlp_grpc_hostname
+
+  target_group_arn = module.lb.target_group_arns[1]
 }
 
 module "ec2" {
@@ -43,6 +45,8 @@ module "ec2" {
   resource_prefix = var.resource_prefix
 
   otlp_hostname = var.otlp_grpc_hostname
+
+  target_group_arn = module.lb.target_group_arns[2]
 }
 
 module "lambda" {
@@ -74,6 +78,8 @@ module "lambda" {
     # AWS_LAMBDA_EXEC_WRAPPER             = "/opt/otel-instrument"
   }
   use_existing_cloudwatch_log_group = var.use_existing_cloudwatch_log_group
+
+  lambda_target_group_arn = module.lb.target_group_arns[3]
 }
 
 module "lambda_python" {
@@ -104,6 +110,8 @@ module "lambda_python" {
 
   use_existing_cloudwatch_log_group = var.use_existing_cloudwatch_log_group
 
+  lambda_target_group_arn = module.lb.target_group_arns[4]
+
 }
 
 module "proxy" {
@@ -131,4 +139,5 @@ module "proxy" {
 
   use_existing_cloudwatch_log_group = var.use_existing_cloudwatch_log_group
 
+  lambda_target_group_arn = module.lb.target_group_arns[0]
 }

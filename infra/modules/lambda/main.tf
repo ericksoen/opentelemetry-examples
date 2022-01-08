@@ -73,20 +73,8 @@ module "alias" {
   allowed_triggers = {
     LoadBalancer = {
       service      = "elasticloadbalancing"
-      source_arn   = aws_lb_target_group.lambda.arn
+      source_arn   = var.lambda_target_group_arn
       statement_id = "AllowExecutionFromlb"
     }
   }
-}
-
-
-resource "aws_lb_target_group" "lambda" {
-  name        = "${var.resource_prefix}-${var.resource_suffix}-tg"
-  target_type = "lambda"
-}
-
-resource "aws_lb_target_group_attachment" "lambda" {
-  target_group_arn = aws_lb_target_group.lambda.arn
-  target_id        = module.alias.lambda_alias_arn
-
 }

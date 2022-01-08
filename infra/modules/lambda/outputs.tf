@@ -1,4 +1,11 @@
-output "target_group_arn" {
-  description = "The target group arn that forwards traffic to the Lambda service"
-  value       = aws_lb_target_group.lambda.arn
+output "lambda_function_arn" {
+  value = module.lambda.lambda_function_arn
+}
+
+output "lambda_function_name" {
+  value = module.lambda.lambda_function_name
+}
+
+output "lambda_alias_arn" {
+  value = module.alias.lambda_alias_arn
 }

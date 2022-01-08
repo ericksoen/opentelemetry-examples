@@ -1,16 +1,4 @@
-resource "aws_lb_target_group" "tg" {
-  name        = "${var.resource_prefix}-ecs-tg"
-  port        = 5000
-  protocol    = "HTTP"
-  target_type = "ip"
-  vpc_id      = var.vpc_id
 
-  health_check {
-    enabled  = true
-    path     = "${var.health_check_path}"
-    interval = 30
-  }
-}
 
 resource "aws_ecs_cluster" "cluster" {
   name = "${var.resource_prefix}"
@@ -41,7 +29,7 @@ resource "aws_ecs_service" "ecs" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.tg.arn
+    target_group_arn = var.target_group_arn
     container_name   = "${var.resource_prefix}"
 
     container_port = 5000
