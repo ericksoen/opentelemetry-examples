@@ -16,15 +16,23 @@ namespace opentelemetry_api_4_6_2
     public class WebApiApplication : HttpApplication
     {
         private IDisposable tracerProvider;
-        private string telemetry_host;
+        private string telemetry_target;
+        private string telemetry_headers;
         protected void Application_Start()
         {
-            telemetry_host = Environment.GetEnvironmentVariable("OpenTelemetryHttpHost");
+            telemetry_target = Environment.GetEnvironmentVariable("OpenTelemetryTarget");
+            telemetry_headers = Environment.GetEnvironmentVariable("OpenTelemetryHeaders");
 
-            if (string.IsNullOrEmpty(telemetry_host))
+            if (string.IsNullOrEmpty(telemetry_target))
             {
-                telemetry_host = telemetry_host = ConfigurationManager.AppSettings["OpenTelemetryHttpHost"];
+                telemetry_target = ConfigurationManager.AppSettings["OpenTelemetryTarget"];
             }
+
+            if (string.IsNullOrEmpty(telemetry_headers))
+            {
+                telemetry_headers = ConfigurationManager.AppSettings["OpenTelemetryHeaders"];
+            }
+
 
             var builder = Sdk.CreateTracerProviderBuilder()
                 .AddAspNetInstrumentation()
@@ -34,11 +42,10 @@ namespace opentelemetry_api_4_6_2
                     ResourceBuilder.CreateDefault()
                         .AddService(serviceName: "dotnet-462-demo", serviceVersion: "v1.0.0")
                 )
-                .AddConsoleExporter()
                 .AddOtlpExporter((options) =>
                 {
-                    options.Endpoint = new Uri($"{telemetry_host}/v1/traces");
-                    options.Protocol = OtlpExportProtocol.HttpProtobuf;
+                    options.Endpoint = new Uri($"{telemetry_target}");
+                    options.Headers = telemetry_headers;
                 });
 
             this.tracerProvider = builder.Build();
