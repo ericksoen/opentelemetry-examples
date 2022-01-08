@@ -1,126 +1,121 @@
+
 #tfsec:ignore:aws-elbv2-alb-not-public:exp:2022-01-31 tfsec:ignore:aws-elb-drop-invalid-headers:exp:2022-01-31
-resource "aws_lb" "alb" {
+module "alb_lb" {
+  source  = "terraform-aws-modules/alb/aws"
+  version = "~> 6.0"
+
   name               = "${var.resource_prefix}-alb"
-  internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb.id]
-  subnets            = data.aws_subnet_ids.lb.ids
-}
+  internal           = false
 
-resource "aws_lb_listener" "default" {
-  load_balancer_arn = aws_lb.alb.id
-  port              = "443"
-  protocol          = "HTTPS"
-  certificate_arn   = module.alb.certificate_arn
-  default_action {
-    type = "fixed-response"
+  vpc_id          = data.aws_vpc.vpc.id
+  subnets         = data.aws_subnet_ids.lb.ids
+  security_groups = [aws_security_group.alb.id]
+  target_groups = [
+    {
+      name             = "${var.resource_prefix}-telemetry-tg"
+      backend_protocol = "HTTP"
+      backend_port     = 55679
+      target_type      = "ip"
+      health_check = {
+        enabled             = true
+        port                = 13133
+        healthy_threshold   = 2
+        unhealthy_threshold = 2
+        interval            = 10
+      }
+    },
+    {
+      name             = "${var.resource_prefix}-otlp-http-tg"
+      backend_port     = 4318
+      backend_protocol = "HTTP"
+      target_type      = "ip"
+      health_check = {
+        port                = 13133
+        healthy_threshold   = 2
+        unhealthy_threshold = 2
+        interval            = 10
+      }
 
-    fixed_response {
-      content_type = "application/json"
-      message_body = "{\"message\": \"hello-world\"}"
-      status_code  = "200"
+    },
+    {
+      name             = "${var.resource_prefix}-metrics-tg"
+      backend_port     = 8888
+      backend_protocol = "HTTP"
+      target_type      = "ip"
+      health_check = {
+        enabled             = true
+        port                = 13133
+        healthy_threshold   = 2
+        unhealthy_threshold = 2
+        interval            = 10
+
+      }
     }
-  }
-}
+  ]
 
-resource "aws_lb_listener_rule" "debug" {
-  listener_arn = aws_lb_listener.default.arn
-  priority     = 4
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.telemetry.arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["/debug/*"]
+  https_listeners = [
+    {
+      port            = 443
+      protocol        = "HTTPS"
+      certificate_arn = module.alb.certificate_arn
+      action_type     = "fixed-response"
+      fixed_response = {
+        message_body = "{\"message\": \"hello-world\"}"
+        status_code  = "200"
+        content_type = "application/json"
+      }
     }
-  }
-}
+  ]
 
-resource "aws_lb_listener_rule" "metrics" {
-  listener_arn = aws_lb_listener.default.arn
-  priority     = 5
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.metrics.arn
-  }
+  https_listener_rules = [
+    {
+      https_listener_index = 0
+      priority             = 4
+      actions = [
+        {
+          type               = "forward"
+          target_group_index = 0
 
-  condition {
-    path_pattern {
-      values = ["/metrics"]
+        }
+      ]
+
+      conditions = [{
+        path_patterns = ["/debug/*"]
+      }]
+    },
+    {
+      https_listener_index = 0
+      priority             = 6
+      actions = [
+        {
+          type               = "forward"
+          target_group_index = 1
+        }
+      ]
+      conditions = [{
+        path_patterns = ["/v1/traces"]
+      }]
+    },
+    {
+      https_listener_index = 0
+      priority             = 5
+      actions = [
+        {
+          type               = "forward"
+          target_group_index = 2
+        }
+      ]
+      conditions = [{
+        path_patterns = ["/metrics"]
+      }]
     }
-  }
-}
 
-resource "aws_lb_listener_rule" "otlp_http" {
-  listener_arn = aws_lb_listener.default.arn
-  priority     = 6
+  ]
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.otlp_http.arn
-  }
+  extra_ssl_certs = [{
+    certificate_arn      = module.alb.certificate_arn
+    https_listener_index = 0
+  }]
 
-  condition {
-    path_pattern {
-      values = ["/v1/traces"]
-    }
-  }
-}
-
-
-resource "aws_lb_listener_certificate" "otlp_http" {
-  listener_arn    = aws_lb_listener.default.arn
-  certificate_arn = module.alb.certificate_arn
-}
-
-resource "aws_lb_target_group" "telemetry" {
-  name        = "${var.resource_prefix}-telemetry-tg"
-  port        = 55679
-  protocol    = "HTTP"
-  target_type = "ip"
-  vpc_id      = data.aws_vpc.vpc.id
-
-  health_check {
-    enabled             = true
-    port                = 13133
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    interval            = 10
-
-  }
-}
-
-resource "aws_lb_target_group" "otlp_http" {
-  name     = "${var.resource_prefix}-otlp-http-tg"
-  port     = 4318
-  protocol = "HTTP"
-  vpc_id   = data.aws_vpc.vpc.id
-
-  target_type = "ip"
-
-  health_check {
-    port                = 13133
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    interval            = 10
-  }
-}
-
-resource "aws_lb_target_group" "metrics" {
-  name        = "${var.resource_prefix}-metrics-tg"
-  port        = 8888
-  protocol    = "HTTP"
-  target_type = "ip"
-  vpc_id      = data.aws_vpc.vpc.id
-
-  health_check {
-    enabled             = true
-    port                = 13133
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    interval            = 10
-
-  }
 }

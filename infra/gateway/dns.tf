@@ -6,7 +6,7 @@ module "nlb" {
 
   route53_zone_id = data.aws_route53_zone.zone.id
 
-  records = [aws_lb.nlb.dns_name]
+  records = [module.nlb_lb.lb_dns_name]
 }
 
 module "alb" {
@@ -17,5 +17,5 @@ module "alb" {
 
   route53_zone_id = data.aws_route53_zone.zone.id
 
-  records = [aws_lb.alb.dns_name]
+  records = [module.alb_lb.lb_dns_name]
 }
