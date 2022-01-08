@@ -81,12 +81,27 @@ module "alias" {
 
 
 resource "aws_lb_target_group" "lambda" {
+  count = local.create_network ? 0 : 1
   name        = "${var.resource_prefix}-${var.resource_suffix}-tg"
   target_type = "lambda"
 }
 
+# Note: the vpc_id for the Lambda target group is ignored. Adding this
+# additional resources allows a no-op migration to the terraform-aws-lb
+# module (which does add this property)
+resource "aws_lb_target_group" "lambda_vpc" {
+  count = local.create_network ? 1 : 0
+  name        = "${var.resource_prefix}-${var.resource_suffix}-tg"
+  target_type = "lambda"
+
+  vpc_id = var.vpc_id
+}
+
+locals {
+  target_group_arn = element(concat(aws_lb_target_group.lambda.*.arn, aws_lb_target_group.lambda_vpc.*.arn), 0)
+}
 resource "aws_lb_target_group_attachment" "lambda" {
-  target_group_arn = aws_lb_target_group.lambda.arn
+  target_group_arn = local.target_group_arn
   target_id        = module.alias.lambda_alias_arn
 
 }
