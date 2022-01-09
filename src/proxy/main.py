@@ -172,17 +172,21 @@ def handler(event, context):
     except AuthorizationError as e:
         print(e)
     finally:
-        end_time = time.time_ns()
-        otlp_http_body = span_factory(trace_id, span_id, start_time, end_time, message_response["statusCode"], path, method, proxy_target=target)
-        trace_resp = requests.post(f"{HTTP_TRACE_GATEWAY_URL}/v1/traces", data = otlp_http_body, headers = {
-        "Content-Type": "application/json"
-        })
 
-        # Observe that the error happened but don't interrupt client flow
-        # Ideally, this would happen as a background thread so that it didn't
-        # impact client latency as well
-        if trace_resp.status_code != 200:
-            print(f"Expected 200 status code. Received {resp.status_code} with body = {json.dumps(resp.json())}")
+        try:
+            end_time = time.time_ns()
+            otlp_http_body = span_factory(trace_id, span_id, start_time, end_time, message_response["statusCode"], path, method, proxy_target=target)
+            trace_resp = requests.post(f"{HTTP_TRACE_GATEWAY_URL}/v1/traces", data = otlp_http_body, headers = {
+            "Content-Type": "application/json"
+            })
+
+            # Observe that the error happened but don't interrupt client flow
+            # Ideally, this would happen as a background thread so that it didn't
+            # impact client latency as well
+            if trace_resp.status_code != 200:
+                print(f"Expected 200 status code. Received {resp.status_code} with body = {json.dumps(resp.json())}")
+        except Exception as e:
+            print(f"Encountered {e} trying to submit to proxy endpoint")
 
         return message_response
 
