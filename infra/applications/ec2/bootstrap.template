@@ -1,8 +1,7 @@
 #!/bin/bash
 
 sudo yum install amazon-cloudwatch-agent -y
-sudo /usr/bin/amazon-cloudwatch-agent-ctl -a fetch-config -o ssm:${otel_config_path} -s
-sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:${cw_config_path}
+sudo /usr/bin/amazon-cloudwatch-agent-ctl -a fetch-config -o ssm:${otel_config_path} -s -c ssm:${cw_config_path} -s 
 
 mkdir -p temp
 aws s3 cp s3://${s3_bucket_name}/scripts ./temp --recursive
