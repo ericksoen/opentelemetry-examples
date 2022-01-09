@@ -11,7 +11,12 @@
           {
             "file_path": "/opt/aws/amazon-cloudwatch-agent/cwagent-otel-collector/logs/cwagent-otel-collector.log",
             "log_group_name": "/application/logs/secondary",
-            "log_stream_name": "{instance_id}/otel/opt-logs"
+            "log_stream_name": "{instance_id}/otel/startup"
+          },
+          {
+            "file_path": "/tmp/opentelemetry.json",
+            "log_group_name": "/application/logs/secondary",
+            "log_stream_name": "{instance_id}/otel/telemetry"
           }
         ]
       }

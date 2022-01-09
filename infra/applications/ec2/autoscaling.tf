@@ -52,7 +52,7 @@ resource "aws_launch_template" "instance" {
     market_type = "spot"
   }
 
-  instance_type = "t3.medium"
+  instance_type = "t3.micro"
 
   monitoring {
     enabled = true

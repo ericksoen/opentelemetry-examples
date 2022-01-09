@@ -4,8 +4,10 @@ receivers:
             grpc:
             http:
 exporters:
+    file:
+      path: /tmp/opentelemetry.json
     logging:
-        loglevel: debug
+      loglevel: debug
     otlp:
       endpoint: ${OTLP_GATEWAY_HOST}:443
 processors:
@@ -24,4 +26,4 @@ service:
       traces:
           receivers: [otlp]
           processors: [batch, attributes/insert]
-          exporters: [logging, otlp]
+          exporters: [logging, otlp, file]
