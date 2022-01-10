@@ -12,6 +12,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.instrumentation.botocore import BotocoreInstrumentor
 from opentelemetry.sdk.extension.aws.resource.ec2 import (
     AwsEc2ResourceDetector,
 )
@@ -41,6 +42,7 @@ raw = requests.get('http://169.254.169.254/latest/dynamic/instance-identity/docu
 instance_data = raw.json()
 region = instance_data["region"]
 client = boto3.client('ssm', region_name=region)
+s3_client = boto3.client('s3')
 lambda_target_response = client.get_parameter(Name="lambda-target-url")
 lambda_target = lambda_target_response['Parameter']['Value']
 otlp_target = os.getenv('OTLP_TARGET', "http://127.0.0.1:4317")
@@ -55,6 +57,7 @@ tracer = trace.get_tracer(__name__)
 app = Flask(__name__)
 FlaskInstrumentor().instrument_app(app)
 RequestsInstrumentor().instrument()
+BotocoreInstrumentor().instrument()
 
 @app.route('/status')
 def status():
@@ -79,6 +82,14 @@ def hello():
         return jsonify({"message": "internal server error"}), 502
 
     normal_latency_ms = random.randint(100, 250)
+    bucket_count = 0
+    with tracer.start_as_current_span('list-s3-buckets-via-ecs') as f:
+        
+        response = s3_client.list_buckets()
+
+        bucket_count = len(response['Buckets'])
+
+        f.set_attribute('s3.bucket_count', bucket_count)    
     with tracer.start_as_current_span("invoke-lambda") as span:
         time.sleep(normal_latency_ms / 1000)
         
