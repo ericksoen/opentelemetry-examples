@@ -7,3 +7,4 @@ requests
 opentelemetry-exporter-otlp
 boto3
 opentelemetry-sdk-extension-aws
+opentelemetry-instrumentation-botocore

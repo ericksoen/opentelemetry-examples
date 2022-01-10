@@ -2,7 +2,9 @@ opentelemetry-api
 opentelemetry-sdk
 opentelemetry-instrumentation-flask
 opentelemetry-instrumentation-requests
+opentelemetry-instrumentation-botocore
 flask
 requests
 opentelemetry-exporter-otlp
 opentelemetry-sdk-extension-aws
+boto3
