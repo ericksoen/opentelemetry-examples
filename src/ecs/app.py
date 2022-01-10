@@ -3,7 +3,7 @@ import requests
 import random
 import os
 import time
-import json
+import boto3
 
 from opentelemetry import trace
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
@@ -12,6 +12,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.instrumentation.botocore import BotocoreInstrumentor
 from opentelemetry.sdk.extension.aws.resource.ecs import (
     AwsEcsResourceDetector,
 )
@@ -39,9 +40,12 @@ trace.get_tracer_provider().add_span_processor(span_processor)
 
 tracer = trace.get_tracer(__name__)
 
+client = boto3.client('s3')
+
 app = Flask(__name__)
 FlaskInstrumentor().instrument_app(app)
 RequestsInstrumentor().instrument()
+BotocoreInstrumentor().instrument()
 
 @app.route("/status")
 def status():
@@ -65,6 +69,16 @@ def hello():
         return jsonify({"message": "internal server error"}), 502
 
     normal_latency_ms = random.randint(250, 400)
+
+    bucket_count = 0
+    with tracer.start_as_current_span('list-s3-buckets-via-ecs') as f:
+        
+        response = client.list_buckets()
+
+        bucket_count = len(response['Buckets'])
+
+        f.set_attribute('s3.bucket_count', bucket_count)
+
     with tracer.start_as_current_span("invoke-ec2"):
         time.sleep(normal_latency_ms / 1000)
         resp = requests.get(http_request_target)

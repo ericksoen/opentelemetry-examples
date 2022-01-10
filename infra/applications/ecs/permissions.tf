@@ -35,6 +35,11 @@ resource "aws_iam_role_policy_attachment" "cw" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
 }
 
+resource "aws_iam_role_policy_attachment" "s3_ro" {
+  role       = aws_iam_role.task.id
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+}
+
 resource "aws_iam_role_policy_attachment" "ecs_task" {
   role       = aws_iam_role.task.id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
