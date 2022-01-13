@@ -23,6 +23,9 @@ variable "use_existing_cloudwatch_log_group" {
   description = "Indicates whether the Lambda CloudWatch group already exists"
 }
 
+variable "lambda_target_group_arn" {
+  
+}
 
 variable "lambda_artifact_path" {
 

@@ -40,3 +40,5 @@ variable "region_name" {
 variable "image_repository_name" { }
 
 variable "otlp_hostname" { }
+
+variable "target_group_arn" {}
